@@ -36,18 +36,19 @@ public class NetworkManager : MonoBehaviour
 	public bool isJoinedLobby=false;
 
 	//OFfLINE
-	public GameObject FPSPlayer;
+	//public GameObject FPSPlayer;
+
 	GameObject player;
 
 	void Start()
 	{
 		//offline init
-		PhotonNetwork.offlineMode =true;
+		//PhotonNetwork.offlineMode =true;
 
 		//general networking init
 		photonView = GetComponent<PhotonView> ();
 		PhotonNetwork.logLevel = PhotonLogLevel.Full;
-		//PhotonNetwork.ConnectUsingSettings("0.3");
+		PhotonNetwork.ConnectUsingSettings("0.3");
 
 		//console message init
 		messages = new Queue<string>(messageCount);
@@ -67,8 +68,8 @@ public class NetworkManager : MonoBehaviour
 			return;
 		lastChangeCounter = sm.counter;
 
-		//photonView.RPC("AddScore_RPC", PhotonTargets.All);
-		AddScore();
+		photonView.RPC("AddScore_RPC", PhotonTargets.All);
+		//AddScore();
 	}
 
 	void OnJoinedLobby()
@@ -88,11 +89,11 @@ public class NetworkManager : MonoBehaviour
 	{	PhotonNetwork.player.name = username.text;
 		
 		//offline
-		PhotonNetwork.JoinRoom(roomname.text);
+		//PhotonNetwork.JoinRoom(roomname.text);
 
 		//online
-		//RoomOptions ro = new RoomOptions() { isVisible = true, maxPlayers = 10 };
-		//PhotonNetwork.JoinOrCreateRoom(roomname.text, ro, TypedLobby.Default);
+		RoomOptions ro = new RoomOptions() { isVisible = true, maxPlayers = 10 };
+		PhotonNetwork.JoinOrCreateRoom(roomname.text, ro, TypedLobby.Default);
 	}
 
 	void OnJoinedRoom()
@@ -113,16 +114,16 @@ public class NetworkManager : MonoBehaviour
 		yield return new WaitForSeconds(respawnTime);
 
 		int index = Random.Range(0, spawnPoints.Length);
-		player = (GameObject)Instantiate(FPSPlayer,
+		player = PhotonNetwork.Instantiate("FPSPlayer",
 			spawnPoints[index].position,
-			spawnPoints[index].rotation);
+			spawnPoints[index].rotation,0);
 		player.transform.name = username .text;
 
 		player.GetComponent<PlayerNetworkMover>().RespawnMe += StartSpawnProcess;
 		player.GetComponent<PlayerNetworkMover>().SendNetworkedMessage += AddMessage;
 
 		sceneCamera.enabled = false;
-		//AddMessage("Spawned Player : " + PhotonNetwork.player.name);
+		AddMessage("Spawned Player : " + PhotonNetwork.player.name);
 		sm.SetScore (PhotonNetwork.player.name, "Kills", 0);
 		sm.SetScore (PhotonNetwork.player.name, "Deaths", 0);
 		sm.SetScore (PhotonNetwork.player.name, "Assists", 0);
@@ -134,15 +135,7 @@ public class NetworkManager : MonoBehaviour
 
 	void AddMessage(string message)
 	{
-		//photonView.RPC ("AddMessage_RPC", PhotonTargets.All, message);
-		messages.Enqueue (message);
-		if (messages.Count > messageCount)
-			messages.Dequeue ();
-		messageWindow.text = "";
-		foreach (string m in messages) {
-			messageWindow.text += m + '\n';
-		}
-
+		photonView.RPC ("AddMessage_RPC", PhotonTargets.All, message);
 	}
 	[PunRPC]
 	void AddMessage_RPC(string message){
@@ -155,6 +148,7 @@ public class NetworkManager : MonoBehaviour
 		}
 	}
 
+	/*
 	void AddScore(){
 		string[] names = sm.GetPlayerNames ("Kills");
 		usernameScore.text = "";
@@ -168,6 +162,7 @@ public class NetworkManager : MonoBehaviour
 			Deaths.text += sm.GetScore(name,"Deaths").ToString() + '\n';
 		}
 	}
+	*/
 
 	[PunRPC]
 	void AddScore_RPC(){

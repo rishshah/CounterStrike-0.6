@@ -11,8 +11,8 @@ public class PlayerShooting : MonoBehaviour
 	float reloadTime = 2f;
 	AudioSource audioSource;
 	int magzinSize = 30;
-	int bulletsOutMagzin = 90;
-	int bulletsInMagzin = 30;
+	public int bulletsOutMagzin = 90;
+	public int bulletsInMagzin = 30;
 	float timeSinceShot = 0;
 	float minTimeBWShots = 0.1f;
 	Transform gun;
@@ -74,7 +74,7 @@ public class PlayerShooting : MonoBehaviour
 		{
 			reloading = true;
 			anim.SetBool("Reloading", true);
-			timeSinceShot -= reloadTime;
+			timeSinceShot =- reloadTime;
 			if (bulletsOutMagzin >= magzinSize-bulletsInMagzin)
 			{
 				bulletsOutMagzin -= (magzinSize - bulletsInMagzin);
