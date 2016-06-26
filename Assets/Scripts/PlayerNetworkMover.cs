@@ -25,15 +25,11 @@ public class PlayerNetworkMover : Photon.MonoBehaviour
 
 		if (photonView.isMine)
 		{
-			damageRecord = new Dictionary<string, float>();
 			GetComponent<Rigidbody>().useGravity = true;
 			GetComponent<FirstPersonController>().enabled = true;
+			GetComponent<UIManager>().enabled = true;
 			GetComponent <AudioListener>().enabled = true;
-			//GetComponent<FirstPersonHeadBob>().enabled = true;
-			// GetComponent<SimpleMouseRotator>().enabled = true;
 			GetComponentInChildren<PlayerShooting>().enabled = true;
-			// foreach (SimpleMouseRotator rot in GetComponentsInChildren<SimpleMouseRotator>())
-			//    rot.enabled = true;
 			foreach (Camera cam in GetComponentsInChildren<Camera>())
 				cam.enabled = true;
 			for(int i=0; i<4; i++)
@@ -48,6 +44,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour
 			StartCoroutine("UpdateData");
 		}
 	}
+
 
 	IEnumerator UpdateData()
 	{
@@ -75,14 +72,21 @@ public class PlayerNetworkMover : Photon.MonoBehaviour
 	}
 
 	void AddDamage(string playerShooting , float damage)
-	{
-		if (damageRecord.ContainsKey(playerShooting))
-			damageRecord[playerShooting] += damage;
-		else
-			damageRecord.Add(playerShooting, damage);
+	{	
+		if (damageRecord == null) {
+			damageRecord = new Dictionary<string, float>();
+		}	
+		if (damageRecord.ContainsKey (playerShooting) ) {
+			damageRecord [playerShooting] += damage;
+
+		} else {
+			Debug.Log (playerShooting);
+			damageRecord.Add (playerShooting, damage);
+		}
 	}
 	void search(string playerKilling)
 	{
+		Debug.Log (playerKilling + "insarch");
 		string assistPlayer="";
 		foreach(KeyValuePair<string, float> entry in damageRecord)
 		{

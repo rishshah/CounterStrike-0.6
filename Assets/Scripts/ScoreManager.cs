@@ -29,10 +29,12 @@ public class ScoreManager : MonoBehaviour {
 			playerScores[username]=new Dictionary<string, int>();
 		}
 		playerScores[username][scoreType]= value;
-
+		Debug.Log (counter);
 	}
 	public void ChangeScore(string username , string scoreType , int amount){
+		
 		int currScore = GetScore (username, scoreType);
+		Debug.Log (currScore);
 		SetScore (username, scoreType, currScore + amount);
 
 	}
