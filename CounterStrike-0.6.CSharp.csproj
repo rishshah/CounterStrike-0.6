@@ -81,6 +81,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\CTPlayerscore.cs" />
     <Compile Include="Assets\Photon Unity Networking\Demos\Demo2DJumpAndRunWithPhysics\Scripts\Demo2DJumpAndRun.cs" />
     <Compile Include="Assets\Photon Unity Networking\Demos\Demo2DJumpAndRunWithPhysics\Scripts\JumpAndRunMovement.cs" />
     <Compile Include="Assets\Photon Unity Networking\Demos\DemoBoxes\ColorPerPlayer.cs" />
@@ -217,9 +218,13 @@
     <Compile Include="Assets\PhotonChatApi\ChatState.cs" />
     <Compile Include="Assets\PhotonChatApi\ChatUserStatus.cs" />
     <Compile Include="Assets\PhotonChatApi\IChatClientListener.cs" />
+    <Compile Include="Assets\Scripts\FirstPersonController.cs" />
+    <Compile Include="Assets\Scripts\HeadBob.cs" />
+    <Compile Include="Assets\Scripts\MouseLook.cs" />
     <Compile Include="Assets\Scripts\NetworkManager.cs" />
     <Compile Include="Assets\Scripts\PlayerNetworkMover.cs" />
     <Compile Include="Assets\Scripts\PlayerShooting.cs" />
+    <Compile Include="Assets\Scripts\RigidbodyFirstPersonController.cs" />
     <Compile Include="Assets\Scripts\SceneChanger.cs" />
     <Compile Include="Assets\Scripts\ScoreManager.cs" />
     <Compile Include="Assets\Scripts\UIManager.cs" />

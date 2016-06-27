@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 public class UIManager : MonoBehaviour {
-
+    bool isActive = true;
     public Text time;
 	public Text bullets;
 	public Text health;
@@ -79,7 +79,15 @@ public class UIManager : MonoBehaviour {
         //Debug.Log(Time.deltaTime);
         if (assigned)
         {
-			this.gameObject.SetActive(!Input.GetKey(KeyCode.Tab));
+            if (isActive != Input.GetKey(KeyCode.Tab))
+            {
+                for (int i = 0; i < this.gameObject.transform.childCount; i++)
+                {
+                    this.gameObject.transform.GetChild(i).gameObject.SetActive(isActive);
+                }
+                isActive = !isActive;
+            }
+			//this.gameObject.SetActive(!Input.GetKey(KeyCode.Tab));
             bullets.text = ps.bulletsInMagzin.ToString() + "/" + ps.bulletsOutMagzin.ToString();
             health.text = pnm.health.ToString();
         }

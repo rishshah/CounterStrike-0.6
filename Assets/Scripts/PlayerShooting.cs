@@ -26,7 +26,7 @@ public class PlayerShooting : MonoBehaviour
 	public ParticleEmitter muzzleFlash;
 	bool shooting = false;
 	bool isAiming = false;
-	bool reloading = false;
+	public bool reloading = false;
 
 	// Use this for initialization
 	void Start()
@@ -49,7 +49,7 @@ public class PlayerShooting : MonoBehaviour
 		if (!reloading) isAiming = Input.GetKey(KeyCode.Mouse1);
 		anim.SetBool("isAiming", isAiming);
 
-		if (Input.GetKey(KeyCode.Mouse0) && !Input.GetKey(KeyCode.LeftShift) && timeSinceShot>=minTimeBWShots && bulletsInMagzin>0)
+		if (timeSinceShot>=minTimeBWShots)
 		{
             if (reloading)
             {
@@ -66,22 +66,26 @@ public class PlayerShooting : MonoBehaviour
                 }
             }
 			reloading = false;
-			anim.SetBool("Reloading", false);
-			bulletsInMagzin -= 1;
-			timeSinceShot = 0f;
-			//muzzleFlash.Play();
-			if (isAiming)
-			{
-				anim.SetTrigger("aimedFire");
-				PlayGunAudio();
-			}
-			else
-			{
-				anim.SetTrigger("blindFire");
-				PlayGunAudio();
-			}
-			muzzleFlash.Emit ();
-			shooting = true;
+            anim.SetBool("Reloading", false);
+            if (Input.GetKey(KeyCode.Mouse0) && !Input.GetKey(KeyCode.LeftShift) && bulletsInMagzin > 0)
+            {
+                anim.SetBool("Reloading", false);
+                bulletsInMagzin -= 1;
+                timeSinceShot = 0f;
+                //muzzleFlash.Play();
+                if (isAiming)
+                {
+                    anim.SetTrigger("aimedFire");
+                    PlayGunAudio();
+                }
+                else
+                {
+                    anim.SetTrigger("blindFire");
+                    PlayGunAudio();
+                }
+                muzzleFlash.Emit();
+                shooting = true;
+            }
 		}
 
 		if (Input.GetKeyDown(KeyCode.R) && bulletsInMagzin<magzinSize && bulletsOutMagzin>0 && !isAiming && !Input.GetKey(KeyCode.LeftShift))
