@@ -182,6 +182,7 @@
      <Compile Include="Assets\PhotonChatApi\ChatState.cs" />
      <Compile Include="Assets\PhotonChatApi\ChatUserStatus.cs" />
      <Compile Include="Assets\PhotonChatApi\IChatClientListener.cs" />
+     <Compile Include="Assets\PowerUp.cs" />
      <Compile Include="Assets\Scripts\FirstPersonController.cs" />
      <Compile Include="Assets\Scripts\HeadBob.cs" />
      <Compile Include="Assets\Scripts\MouseLook.cs" />
