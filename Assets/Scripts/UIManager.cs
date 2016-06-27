@@ -3,13 +3,14 @@ using System.Collections;
 using UnityEngine.UI;
 public class UIManager : MonoBehaviour {
 
-    public GameObject normalWindow;
     public Text time;
 	public Text bullets;
 	public Text health;
-
-	public PlayerShooting ps;
-	public PlayerNetworkMover pnm;
+    public GameObject CT;
+    public NetworkManager nm;
+    bool assigned = false;
+    PlayerShooting ps;
+	PlayerNetworkMover pnm;
 
     int minutes;
 	int seconds;
@@ -18,17 +19,15 @@ public class UIManager : MonoBehaviour {
 	
     // Use this for initialization
 	void Start()
-	{
-		timesec = Roundtime;
+    {
+        timesec = Roundtime;
 		TimeConvert();
 		Displaytime();
-		bullets.text = ps.bulletsInMagzin.ToString() + "/" + ps.bulletsOutMagzin.ToString();
-		health.text = pnm.health.ToString();    
 	}
 	void Displaytime()
 	{   
 		time.text = minutes.ToString() + " : " + seconds.ToString();
-		///  Debug.Log();
+		//  Debug.Log();
 
 	}
 	void TimeConvert()
@@ -36,15 +35,38 @@ public class UIManager : MonoBehaviour {
 		minutes = (int)timesec / 60;
 		seconds = (int)timesec % 60;
 	}
+    void Init()
+    {
+        for (int i = 0; i < CT.transform.childCount; i++)
+        {
+            if (CT.transform.GetChild(i).gameObject.GetPhotonView().isMine)
+            {
+                pnm = CT.transform.GetChild(i).gameObject.GetComponent<PlayerNetworkMover>();
+                ps = CT.transform.GetChild(i).gameObject.GetComponentInChildren<PlayerShooting>();
+                Debug.Log("Found " + i.ToString());
+                bullets.text = ps.bulletsInMagzin.ToString() + "/" + ps.bulletsOutMagzin.ToString();
+                health.text = pnm.health.ToString();
+                assigned = true;
+            }
+        }
 
+    }
 	// Update is called once per frame
 	void Update () {
-        normalWindow.SetActive(!Input.GetKey(KeyCode.Tab));
+        if (!assigned)
+        {
+            if (nm.isJoinedRoom) Init();
+
+        }
+        this.gameObject.SetActive(!Input.GetKey(KeyCode.Tab));
 		timesec -= Time.deltaTime;
 		TimeConvert();
 		Displaytime();
-		//Debug.Log(Time.deltaTime);
-		bullets.text = ps.bulletsInMagzin.ToString() + "/" + ps.bulletsOutMagzin.ToString();
-		health.text = pnm.health.ToString();
+        //Debug.Log(Time.deltaTime);
+        if (assigned)
+        {
+            bullets.text = ps.bulletsInMagzin.ToString() + "/" + ps.bulletsOutMagzin.ToString();
+            health.text = pnm.health.ToString();
+        }
 	}
 }

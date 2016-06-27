@@ -20,7 +20,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour
 	Dictionary<string, float> damageRecord;
     public ScoreManager sm;
     //
-    public Canvas canvas;
+    //public Canvas canvas;
 	void Start()
 	{
 
@@ -28,8 +28,8 @@ public class PlayerNetworkMover : Photon.MonoBehaviour
 		{
 			GetComponent<Rigidbody>().useGravity = true;
 			GetComponent<FirstPersonController>().enabled = true;
-			GetComponent<UIManager>().enabled = true;
-            canvas.enabled = true;
+			//GetComponent<UIManager>().enabled = true;
+            //canvas.enabled = true;
 			GetComponent <AudioListener>().enabled = true;
 			GetComponentInChildren<PlayerShooting>().enabled = true;
 			foreach (Camera cam in GetComponentsInChildren<Camera>())

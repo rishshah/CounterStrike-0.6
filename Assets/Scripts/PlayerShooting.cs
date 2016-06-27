@@ -51,6 +51,20 @@ public class PlayerShooting : MonoBehaviour
 
 		if (Input.GetKey(KeyCode.Mouse0) && !Input.GetKey(KeyCode.LeftShift) && timeSinceShot>=minTimeBWShots && bulletsInMagzin>0)
 		{
+            if (reloading)
+            {
+
+                if (bulletsOutMagzin >= magzinSize - bulletsInMagzin)
+                {
+                    bulletsOutMagzin -= (magzinSize - bulletsInMagzin);
+                    bulletsInMagzin = magzinSize;
+                }
+                else
+                {
+                    bulletsInMagzin += bulletsOutMagzin;
+                    bulletsOutMagzin = 0;
+                }
+            }
 			reloading = false;
 			anim.SetBool("Reloading", false);
 			bulletsInMagzin -= 1;
@@ -75,16 +89,6 @@ public class PlayerShooting : MonoBehaviour
 			reloading = true;
 			anim.SetBool("Reloading", true);
 			timeSinceShot =- reloadTime;
-			if (bulletsOutMagzin >= magzinSize-bulletsInMagzin)
-			{
-				bulletsOutMagzin -= (magzinSize - bulletsInMagzin);
-				bulletsInMagzin = magzinSize;
-			}
-			else
-			{
-				bulletsInMagzin += bulletsOutMagzin;
-				bulletsOutMagzin = 0;
-			}
 		}
 
 	}

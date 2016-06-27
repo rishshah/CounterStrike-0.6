@@ -111,8 +111,8 @@ public class NetworkManager : MonoBehaviour
         //#pnm
         player.GetComponent<Rigidbody>().useGravity = true;
         player.GetComponent<FirstPersonController>().enabled = true;
-        player.GetComponent<UIManager>().enabled = true;
-        player.GetComponentInChildren<Canvas>().enabled = true;
+        //player.GetComponent<UIManager>().enabled = true;
+        //player.GetComponentInChildren<Canvas>().enabled = true;
         player.GetComponent<AudioListener>().enabled = true;
         player.GetComponentInChildren<PlayerShooting>().enabled = true;
         foreach (Camera cam in player.GetComponentsInChildren<Camera>())
