@@ -178,7 +178,8 @@ public class NetworkManager : MonoBehaviour
 		player.GetComponent<FirstPersonController>().enabled = true;
 		player.GetComponent<AudioListener>().enabled = true;
 		player.GetComponentInChildren<PlayerShooting>().enabled = true;
-		foreach (Camera cam in player.GetComponentsInChildren<Camera>())
+        player. GetComponent<PowerUp>().enabled = true;
+        foreach (Camera cam in player.GetComponentsInChildren<Camera>())
 			cam.enabled = true;
 		for (int i = 0; i < 4; i++){
 			player.transform.Find("FirstPersonCharacter/Camera/M4A1/Mesh_0011").GetChild(i).gameObject.layer = 11;
