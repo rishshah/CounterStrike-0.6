@@ -6,7 +6,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{E7A1DF9B-0164-7E74-ADBD-2D0B7E96AA64}</ProjectGuid>
+    <ProjectGuid>{69785CD0-E258-1851-B03B-61914EB1F4B1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp-Editor</AssemblyName>
@@ -99,13 +99,13 @@
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/TreeEditor/Editor/UnityEditor.TreeEditor.dll</HintPath>
  </Reference>
  <Reference Include="Newtonsoft.Json">
- <HintPath>C:/Users/Public/Documents/Unity Projects/Merry-Fragmas/Assets/Photon Unity Networking/Editor/PhotonNetwork/Newtonsoft.Json.dll</HintPath>
+ <HintPath>C:/Users/Rishabh shah/Downloads/Freshie Summer/CounterStrike-0.6/Assets/Photon Unity Networking/Editor/PhotonNetwork/Newtonsoft.Json.dll</HintPath>
  </Reference>
  <Reference Include="Photon3Unity3D">
- <HintPath>C:/Users/Public/Documents/Unity Projects/Merry-Fragmas/Assets/Plugins/Photon3Unity3D.dll</HintPath>
+ <HintPath>C:/Users/Rishabh shah/Downloads/Freshie Summer/CounterStrike-0.6/Assets/Plugins/Photon3Unity3D.dll</HintPath>
  </Reference>
  <Reference Include="websocket-sharp">
- <HintPath>C:/Users/Public/Documents/Unity Projects/Merry-Fragmas/Assets/Plugins/WebSocket/websocket-sharp.dll</HintPath>
+ <HintPath>C:/Users/Rishabh shah/Downloads/Freshie Summer/CounterStrike-0.6/Assets/Plugins/WebSocket/websocket-sharp.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.Graphs">
  <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEditor.Graphs.dll</HintPath>
@@ -125,9 +125,9 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
-      <Project>{C134F742-113E-79C3-9674-98E15FA78FD8}</Project>      <Name>Assembly-CSharp-firstpass</Name>    </ProjectReference>
+      <Project>{4303D743-3188-B7D6-0EA3-B1A5D78D8DE0}</Project>      <Name>Assembly-CSharp-firstpass</Name>    </ProjectReference>
     <ProjectReference Include="Assembly-CSharp.csproj">
-      <Project>{F2F068D7-8E86-1F52-D7CE-58FA232AB493}</Project>      <Name>Assembly-CSharp</Name>    </ProjectReference>
+      <Project>{F011BFD9-2E32-B75F-4DCC-78C6292D4ED6}</Project>      <Name>Assembly-CSharp</Name>    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

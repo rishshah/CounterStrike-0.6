@@ -20,6 +20,7 @@ public class UIManager : MonoBehaviour {
     // Use this for initialization
 	void Start()
     {
+		this.gameObject.SetActive (false);
         timesec = Roundtime;
 		TimeConvert();
 		Displaytime();
@@ -58,13 +59,13 @@ public class UIManager : MonoBehaviour {
             if (nm.isJoinedRoom) Init();
 
         }
-        this.gameObject.SetActive(!Input.GetKey(KeyCode.Tab));
 		timesec -= Time.deltaTime;
 		TimeConvert();
 		Displaytime();
         //Debug.Log(Time.deltaTime);
         if (assigned)
         {
+			this.gameObject.SetActive(!Input.GetKey(KeyCode.Tab));
             bullets.text = ps.bulletsInMagzin.ToString() + "/" + ps.bulletsOutMagzin.ToString();
             health.text = pnm.health.ToString();
         }

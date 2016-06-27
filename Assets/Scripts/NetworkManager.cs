@@ -9,9 +9,13 @@ public class NetworkManager : MonoBehaviour
 	[SerializeField]
 	Text connectionText;
 	[SerializeField]
-	Transform[] spawnPoints;
-	[SerializeField]
 	Camera sceneCamera;
+
+	//#segregation
+	[SerializeField]
+	Transform[] CTspawnPoints;
+	[SerializeField]
+	Transform[] TspawnPoints;
 
 	//UI lobby
 	[SerializeField] InputField username;
@@ -27,10 +31,14 @@ public class NetworkManager : MonoBehaviour
 	//UI ScoreTab
 	public ScoreManager sm;
 	int lastChangeCounter;
-	public Text usernameScore;
-	public Text Kills;
-	public Text Assists;
-	public Text Deaths;
+	public Text CTusernameScore;
+	public Text CTKills;
+	public Text CTAssists;
+	public Text CTDeaths;
+	public Text TusernameScore;
+	public Text TKills;
+	public Text TAssists;
+	public Text TDeaths;
 
 	//General state check
 	public bool isJoinedRoom=false;
@@ -39,8 +47,9 @@ public class NetworkManager : MonoBehaviour
 	//#toggle# multiplayer & singleplayer
 	public SceneChanger sc;
 
-	//toggle
-	public GameObject FPSPlayer;
+	//toggle and segregation
+	public GameObject counterFPSPlayer;
+	public GameObject terroFPSPlayer;
 	GameObject player;
 
     //CT and T segregation
@@ -106,26 +115,7 @@ public class NetworkManager : MonoBehaviour
 		connectionText.text = "";
 		StartSpawnProcess(0f);
 	}
-    void EnableComponents()
-    {
-        //#pnm
-        player.GetComponent<Rigidbody>().useGravity = true;
-        player.GetComponent<FirstPersonController>().enabled = true;
-        //player.GetComponent<UIManager>().enabled = true;
-        //player.GetComponentInChildren<Canvas>().enabled = true;
-        player.GetComponent<AudioListener>().enabled = true;
-        player.GetComponentInChildren<PlayerShooting>().enabled = true;
-        foreach (Camera cam in player.GetComponentsInChildren<Camera>())
-            cam.enabled = true;
-        for (int i = 0; i < 4; i++)
-        {
-            player.transform.Find("FirstPersonCharacter/Camera/M4A1/Mesh_0011").GetChild(i).gameObject.layer = 11;
-        }
-        player.transform.Find("FirstPersonCharacter/Camera/M4A1/mag/Mesh_0012").gameObject.layer = 11;
-        player.transform.Find("FirstPersonCharacter/Camera/M4A1/mag").gameObject.layer = 11;
-        player.transform.Find("FirstPersonCharacter/Camera/M4A1/Mesh_0011").gameObject.layer = 11;
-        //#pnm
-    }
+    
     void StartSpawnProcess(float respawnTime)
 	{
 		sceneCamera.enabled = true;
@@ -137,23 +127,36 @@ public class NetworkManager : MonoBehaviour
         yield return new WaitForSeconds(respawnTime);
         sceneCamera.enabled = false;
 
-        int index = Random.Range(0, spawnPoints.Length);
-        if (!sc.singlePlayer)
-        {
-            player = PhotonNetwork.Instantiate("FPSPlayer", spawnPoints[index].position, spawnPoints[index].rotation, 0);
-        }
-        else
-        {
-            player = (GameObject)Instantiate(FPSPlayer, spawnPoints[index].position, spawnPoints[index].rotation);
-            //#pnm
+		//DELEGATE NOTING
+		player.GetComponent<PlayerNetworkMover>().RespawnMe += StartSpawnProcess;
+		player.GetComponent<PlayerNetworkMover>().SendNetworkedMessage += AddMessage;
+		sm.SetScoreRPC += SetScore;
+
+		//#toggle & #segregation spawning
+        int CTindex = Random.Range(0, CTspawnPoints.Length);
+		int Tindex = Random.Range(0, TspawnPoints.Length);
+
+		if (!sc.singlePlayer)  {
+			if(sc.isPlayerCT)
+            	player = PhotonNetwork.Instantiate("counterFPSPlayer", CTspawnPoints[CTindex].position, CTspawnPoints[CTindex].rotation, 0);
+			else 
+				player = PhotonNetwork.Instantiate("terroFPSPlayer", TspawnPoints[Tindex].position, TspawnPoints[Tindex].rotation, 0);
+		}
+        else {
+			if(sc.isPlayerCT)
+            	player = (GameObject)Instantiate(counterFPSPlayer, CTspawnPoints[CTindex].position, CTspawnPoints[CTindex].rotation);
+			else
+				player = (GameObject)Instantiate(terroFPSPlayer, TspawnPoints[Tindex].position, TspawnPoints[Tindex].rotation);
+			//#pnm
             EnableComponents();
         }
-        player.transform.parent = CT.transform;
-        player.transform.name = username.text;
+        
+		player.transform.name = username.text;
 
-        player.GetComponent<PlayerNetworkMover>().RespawnMe += StartSpawnProcess;
-        player.GetComponent<PlayerNetworkMover>().SendNetworkedMessage += AddMessage;
-        sm.SetScoreRPC += SetScore;
+		//segregation
+		if(sc.isPlayerCT) player.transform.parent = CT.transform;
+		else player.transform.parent = T.transform;
+
 
         //console message for spawn
         AddMessage("Spawned Player : " + PhotonNetwork.player.name);
@@ -164,8 +167,32 @@ public class NetworkManager : MonoBehaviour
             SetScore(PhotonNetwork.player.name, "Kills", 0);
         }
     }
+	//################################################ HELPER FN NOT NETWORK RELATED ###################################################
+	void EnableComponents()
+	{
+		//#pnm
+		player.GetComponent<Rigidbody>().useGravity = true;
+		player.GetComponent<FirstPersonController>().enabled = true;
+		player.GetComponent<AudioListener>().enabled = true;
+		player.GetComponentInChildren<PlayerShooting>().enabled = true;
+		foreach (Camera cam in player.GetComponentsInChildren<Camera>())
+			cam.enabled = true;
+		for (int i = 0; i < 4; i++){
+			player.transform.Find("FirstPersonCharacter/Camera/M4A1/Mesh_0011").GetChild(i).gameObject.layer = 11;
+		}
+		player.transform.Find("FirstPersonCharacter/Camera/M4A1/mag/Mesh_0012").gameObject.layer = 11;
+		player.transform.Find("FirstPersonCharacter/Camera/M4A1/mag").gameObject.layer = 11;
+		player.transform.Find("FirstPersonCharacter/Camera/M4A1/Mesh_0011").gameObject.layer = 11;
+		//#pnm
+	}
+		
+	void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+	{
+	}
+	//################################################ RPCS AND thEIR HELPER FN ###################################################
 
-    void SetScore(string username, string scoreType, int value)
+	//SETSCORE RPC
+	void SetScore(string username, string scoreType, int value)
     {
         photonView.RPC("SetScore_RPC", PhotonTargets.All, username, scoreType, value);
     }
@@ -174,29 +201,14 @@ public class NetworkManager : MonoBehaviour
     {
         sm.Init();
         sm.counter++;
-        if (sm.playerScores.ContainsKey(username) == false)
-        {
+        if (sm.playerScores.ContainsKey(username) == false){
             sm.playerScores[username] = new Dictionary<string, int>();
         }
         sm.playerScores[username][scoreType] = value;
     }
-   
-	void AddMessage(string message)
-	{	
-		//toggle
-		if (sc.singlePlayer) {
-			messages.Enqueue (message);
-			if (messages.Count > messageCount)
-				messages.Dequeue ();
-			messageWindow.text = "";
-			foreach (string m in messages) {
-				messageWindow.text += m + '\n';
-			}
-		}
-		else photonView.RPC ("AddMessage_RPC", PhotonTargets.All, message);
-	}
-	[PunRPC]
-	void AddMessage_RPC(string message){
+
+	//CONSOLE MESSAGE RPC
+	void ShortAddMessage(string message){
 		messages.Enqueue (message);
 		if (messages.Count > messageCount)
 			messages.Dequeue ();
@@ -205,48 +217,41 @@ public class NetworkManager : MonoBehaviour
 			messageWindow.text += m + '\n';
 		}
 	}
+	void AddMessage(string message)
+	{	
+		//toggle
+		if (sc.singlePlayer) {
+			ShortAddMessage (message);
+		}
+		else photonView.RPC ("AddMessage_RPC", PhotonTargets.All, message);
+	}
+	[PunRPC]
+	void AddMessage_RPC(string message){
+		ShortAddMessage (message);
+	}
 
+	//DISPLAY SCORE RPC
+	void ShortAddScore(){
+		string[] names = sm.GetPlayerNames ("Kills");
+		CTusernameScore.text = "";
+		CTKills.text = "";
+		CTAssists.text = "";
+		CTDeaths.text = "";
+		foreach (string name in names) {
+			CTusernameScore.text += name + '\n';
+			CTKills.text += sm.GetScore (name, "Kills").ToString () + '\n';
+			CTAssists.text += sm.GetScore (name, "Assists").ToString () + '\n';
+			CTDeaths.text += sm.GetScore (name, "Deaths").ToString () + '\n';
+		}
+	}
 	void AddScore(){
 		if (sc.singlePlayer) {
-			string[] names = sm.GetPlayerNames ("Kills");
-			usernameScore.text = "";
-			Kills.text = "";
-			Assists.text = "";
-			Deaths.text = "";
-			foreach (string name in names) {
-				usernameScore.text += name + '\n';
-				Kills.text += sm.GetScore (name, "Kills").ToString () + '\n';
-				Assists.text += sm.GetScore (name, "Assists").ToString () + '\n';
-				Deaths.text += sm.GetScore (name, "Deaths").ToString () + '\n';
-			}
+			ShortAddScore ();	
 		}
 		else 	photonView.RPC("AddScore_RPC", PhotonTargets.All);
 	}
 	[PunRPC]
 	void AddScore_RPC(){
-		string[] names = sm.GetPlayerNames ("Kills");
-		usernameScore.text = "";
-		Kills.text = "";
-		Assists.text = "";
-		Deaths.text = "";
-		foreach (string name in names) {
-			usernameScore.text += name + '\n';
-			Kills.text += sm.GetScore(name,"Kills").ToString() + '\n';
-			Assists.text += sm.GetScore(name,"Assists").ToString() + '\n';
-			Deaths.text += sm.GetScore(name,"Deaths").ToString() + '\n';
-		}
+		ShortAddScore ();
 	}
-
-    void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        /* if (stream.isWriting)
-         {
-             stream.SendNext(sm.playerScores);
-         }
-         else
-         {
-             sm.playerScores = (Dictionary<string, Dictionary<string, int>>)stream.ReceiveNext();
-         }*/
-    }
-
 }

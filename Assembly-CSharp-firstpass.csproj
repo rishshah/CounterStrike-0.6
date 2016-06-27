@@ -6,7 +6,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{C134F742-113E-79C3-9674-98E15FA78FD8}</ProjectGuid>
+    <ProjectGuid>{4303D743-3188-B7D6-0EA3-B1A5D78D8DE0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp-firstpass</AssemblyName>
@@ -118,10 +118,10 @@
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
  </Reference>
  <Reference Include="Photon3Unity3D">
- <HintPath>C:/Users/Public/Documents/Unity Projects/Merry-Fragmas/Assets/Plugins/Photon3Unity3D.dll</HintPath>
+ <HintPath>C:/Users/Rishabh shah/Downloads/Freshie Summer/CounterStrike-0.6/Assets/Plugins/Photon3Unity3D.dll</HintPath>
  </Reference>
  <Reference Include="websocket-sharp">
- <HintPath>C:/Users/Public/Documents/Unity Projects/Merry-Fragmas/Assets/Plugins/WebSocket/websocket-sharp.dll</HintPath>
+ <HintPath>C:/Users/Rishabh shah/Downloads/Freshie Summer/CounterStrike-0.6/Assets/Plugins/WebSocket/websocket-sharp.dll</HintPath>
  </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

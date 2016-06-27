@@ -18,8 +18,14 @@ public class SceneChanger : MonoBehaviour {
 	public InputField tBots;
 	public InputField ctBots;
 
+	//Network related
 	public NetworkManager nm;
 	public Button joinRoom;
+
+	//CT and T segregation
+	public bool isPlayerCT=false; 
+	public InputField numOfCTBots;
+	public InputField numOfTBots;
 
 	public bool singlePlayer = false;
 
@@ -88,6 +94,13 @@ public class SceneChanger : MonoBehaviour {
 		}
 		menu3.SetActive (false);
 		canvasBg.SetActive (false);
+	}
+
+	public void CTInit(){
+		isPlayerCT = true;
+	}
+
+	public void TInit(){
 
 	}
 }
