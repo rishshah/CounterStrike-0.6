@@ -165,8 +165,10 @@ public class NetworkManager : MonoBehaviour
         //score init
         sm.Init();
         if (!sm.playerScores.ContainsKey(PhotonNetwork.player.name)) { 
-            SetScore(PhotonNetwork.player.name, "Kills", 0);
-        }
+			SetScore(PhotonNetwork.player.name, "Kills", 0);
+			if (sc.isPlayerCT)	sm.playerScores [PhotonNetwork.player.name] ["Team"] = 1;
+			else 	sm.playerScores [PhotonNetwork.player.name] ["Team"] = 0;   
+		}
     }
 	//################################################ HELPER FN NOT NETWORK RELATED ###################################################
 	void EnableComponents()
@@ -203,9 +205,9 @@ public class NetworkManager : MonoBehaviour
         sm.Init();
         sm.counter++;
         if (sm.playerScores.ContainsKey(username) == false){
-            sm.playerScores[username] = new Dictionary<string, int>();
+			sm.playerScores[username] = new Dictionary<string, int>();
         }
-        sm.playerScores[username][scoreType] = value;
+		sm.playerScores[username][scoreType] = value;
     }
 
 	//CONSOLE MESSAGE RPC
@@ -233,16 +235,28 @@ public class NetworkManager : MonoBehaviour
 
 	//DISPLAY SCORE RPC
 	void ShortAddScore(){
-		string[] names = sm.GetPlayerNames ("Kills");
+		string[] CTnames = sm.GetPlayerNamesCT ("Kills");
 		CTusernameScore.text = "";
 		CTKills.text = "";
 		CTAssists.text = "";
 		CTDeaths.text = "";
-		foreach (string name in names) {
+		foreach (string name in CTnames) {
 			CTusernameScore.text += name + '\n';
 			CTKills.text += sm.GetScore (name, "Kills").ToString () + '\n';
 			CTAssists.text += sm.GetScore (name, "Assists").ToString () + '\n';
 			CTDeaths.text += sm.GetScore (name, "Deaths").ToString () + '\n';
+		}
+	
+		string[] Tnames = sm.GetPlayerNamesT ("Kills");
+		TusernameScore.text = "";
+		TKills.text = "";
+		TAssists.text = "";
+		TDeaths.text = "";
+		foreach (string name in Tnames) {
+			TusernameScore.text += name + '\n';
+			TKills.text += sm.GetScore (name, "Kills").ToString () + '\n';
+			TAssists.text += sm.GetScore (name, "Assists").ToString () + '\n';
+			TDeaths.text += sm.GetScore (name, "Deaths").ToString () + '\n';
 		}
 	}
 	void AddScore(){

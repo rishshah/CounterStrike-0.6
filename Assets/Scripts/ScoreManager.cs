@@ -5,7 +5,7 @@ public class ScoreManager : MonoBehaviour {
 
 	public Dictionary<string, Dictionary<string, int>>   playerScores ;
 	public int counter=0;
-    public delegate void Score(string username, string scoreType, int value);
+	public delegate void Score(string username, string scoreType, int value);
     public event Score SetScoreRPC;
     public void Init(){
 		if (playerScores != null)
@@ -32,7 +32,22 @@ public class ScoreManager : MonoBehaviour {
             SetScoreRPC (username, scoreType, currScore + amount);
 
 	}
-	public string[] GetPlayerNames(string sortType){
-		return playerScores.Keys.OrderByDescending (n => GetScore (n, sortType)).ToArray();
+	public string[] GetPlayerNamesCT(string sortType){
+		List<string> ct = new List<string>();	
+		foreach (string key in playerScores.Keys) {
+			if (playerScores [key] ["Team"] == 1) {
+				ct.Add(key);
+			}
+		}
+		return ct.OrderByDescending (n => GetScore (n, sortType)).ToArray();
+	}
+	public string[] GetPlayerNamesT(string sortType){
+		List<string> t = new List<string> ();
+		foreach (string key in playerScores.Keys) {
+			if (playerScores [key] ["Team"] == 0) {
+				t.Add(key);
+			}
+		}
+		return t.OrderByDescending (n => GetScore (n, sortType)).ToArray();
 	}
 }
