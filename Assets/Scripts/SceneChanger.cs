@@ -11,6 +11,7 @@ public class SceneChanger : MonoBehaviour {
 	public GameObject tabWindow; 
 	public GameObject consoleWindow; 
 	public GameObject error;
+	public GameObject normalWindow;
 
 	//error validation
 	public InputField username;
@@ -94,6 +95,7 @@ public class SceneChanger : MonoBehaviour {
 		}
 		menu3.SetActive (false);
 		canvasBg.SetActive (false);
+		normalWindow.SetActive (true);
 	}
 
 	public void CTInit(){

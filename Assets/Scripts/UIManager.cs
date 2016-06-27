@@ -7,6 +7,7 @@ public class UIManager : MonoBehaviour {
 	public Text bullets;
 	public Text health;
     public GameObject CT;
+	public GameObject T;
     public NetworkManager nm;
     bool assigned = false;
     PlayerShooting ps;
@@ -20,7 +21,6 @@ public class UIManager : MonoBehaviour {
     // Use this for initialization
 	void Start()
     {
-		this.gameObject.SetActive (false);
         timesec = Roundtime;
 		TimeConvert();
 		Displaytime();
@@ -48,9 +48,23 @@ public class UIManager : MonoBehaviour {
                 bullets.text = ps.bulletsInMagzin.ToString() + "/" + ps.bulletsOutMagzin.ToString();
                 health.text = pnm.health.ToString();
                 assigned = true;
+				return;
             }
         }
 
+		for (int i = 0; i < T.transform.childCount; i++)
+		{
+			if (T.transform.GetChild(i).gameObject.GetPhotonView().isMine)
+			{
+				pnm = T.transform.GetChild(i).gameObject.GetComponent<PlayerNetworkMover>();
+				ps = T.transform.GetChild(i).gameObject.GetComponentInChildren<PlayerShooting>();
+				Debug.Log("Found " + i.ToString());
+				bullets.text = ps.bulletsInMagzin.ToString() + "/" + ps.bulletsOutMagzin.ToString();
+				health.text = pnm.health.ToString();
+				assigned = true;
+				return;
+			}
+		}
     }
 	// Update is called once per frame
 	void Update () {

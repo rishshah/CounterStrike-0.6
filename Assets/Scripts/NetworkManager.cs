@@ -48,14 +48,14 @@ public class NetworkManager : MonoBehaviour
 	public SceneChanger sc;
 
 	//toggle and segregation
-	public GameObject counterFPSPlayer;
-	public GameObject terroFPSPlayer;
+	public GameObject FPSPlayer;
 	GameObject player;
 
     //CT and T segregation
     public GameObject CT;
     public GameObject T;
-
+	Color blue= new Color(0,0,255);
+	Color red= new Color(255,0,0);
 
     void Start()
 	{
@@ -127,38 +127,39 @@ public class NetworkManager : MonoBehaviour
         yield return new WaitForSeconds(respawnTime);
         sceneCamera.enabled = false;
 
-		//DELEGATE NOTING
-		player.GetComponent<PlayerNetworkMover>().RespawnMe += StartSpawnProcess;
-		player.GetComponent<PlayerNetworkMover>().SendNetworkedMessage += AddMessage;
-		sm.SetScoreRPC += SetScore;
-
 		//#toggle & #segregation spawning
         int CTindex = Random.Range(0, CTspawnPoints.Length);
 		int Tindex = Random.Range(0, TspawnPoints.Length);
 
 		if (!sc.singlePlayer)  {
-			if(sc.isPlayerCT)
-            	player = PhotonNetwork.Instantiate("counterFPSPlayer", CTspawnPoints[CTindex].position, CTspawnPoints[CTindex].rotation, 0);
-			else 
-				player = PhotonNetwork.Instantiate("terroFPSPlayer", TspawnPoints[Tindex].position, TspawnPoints[Tindex].rotation, 0);
-		}
+			player = PhotonNetwork.Instantiate("FPSPlayer", CTspawnPoints[CTindex].position, CTspawnPoints[CTindex].rotation, 0);
+	    }
         else {
-			if(sc.isPlayerCT)
-            	player = (GameObject)Instantiate(counterFPSPlayer, CTspawnPoints[CTindex].position, CTspawnPoints[CTindex].rotation);
-			else
-				player = (GameObject)Instantiate(terroFPSPlayer, TspawnPoints[Tindex].position, TspawnPoints[Tindex].rotation);
-			//#pnm
+			player = (GameObject)Instantiate(FPSPlayer, CTspawnPoints[CTindex].position, CTspawnPoints[CTindex].rotation);
+	        //#pnm
             EnableComponents();
         }
-        
 		player.transform.name = username.text;
 
 		//segregation
-		if(sc.isPlayerCT) player.transform.parent = CT.transform;
-		else player.transform.parent = T.transform;
+		if (sc.isPlayerCT) {
+			player.transform.parent = CT.transform;
+			player.transform.Find ("Body").GetComponent<MeshRenderer> ().material.color = blue;
+			player.transform.Find ("Head").GetComponent<MeshRenderer> ().material.color = blue;
+		} 
+		else {
+			player.transform.parent = T.transform;
+			player.transform.Find("Body").GetComponent<MeshRenderer> ().material.color = red  ;
+			player.transform.Find("Head").GetComponent<MeshRenderer> ().material.color = red ;
 
+		}
+		//DELEGATE NOTING
+		player.GetComponent<PlayerNetworkMover>().RespawnMe += StartSpawnProcess;
+		player.GetComponent<PlayerNetworkMover>().SendNetworkedMessage += AddMessage;
+		sm.SetScoreRPC += SetScore;
 
-        //console message for spawn
+        
+		//console message for spawn
         AddMessage("Spawned Player : " + PhotonNetwork.player.name);
 
         //score init
