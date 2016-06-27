@@ -29,6 +29,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour
 			GetComponent<FirstPersonController>().enabled = true;
 			GetComponent <AudioListener>().enabled = true;
 			GetComponentInChildren<PlayerShooting>().enabled = true;
+            GetComponent<PowerUp>().enabled = true;
 			foreach (Camera cam in GetComponentsInChildren<Camera>())
 				cam.enabled = true;
 			for(int i=0; i<4; i++)
