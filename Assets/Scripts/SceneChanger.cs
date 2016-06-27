@@ -27,23 +27,32 @@ public class SceneChanger : MonoBehaviour {
 		joinRoom.enabled = false;
 		canvasBg.SetActive (true);
 		menu1.SetActive (true);
-		consoleWindow.SetActive (false);
 	}
 		
 	void Update(){
 		tabWindow.SetActive (Input.GetKey (KeyCode.Tab));
-		consoleWindow.SetActive (!Input.GetKey (KeyCode.Tab));
+		//consoleWindow.SetActive (!Input.GetKey (KeyCode.Tab));
 
 		if (nm.isJoinedLobby == true) joinRoom.enabled = true;
 	}
 
 	public void EnableSinglePlayer(){
 		singlePlayer = true;
-		joinRoom.enabled = true;
+        //toggle
+        PhotonNetwork.offlineMode = true;
+        joinRoom.enabled = true;
 		joinRoom.GetComponentInChildren<Text>().text="Create Room";
 	}
+    public void EnableMultiPlayer()
+    {
+        singlePlayer = false;
+        //toggle
+        PhotonNetwork.offlineMode = false;
+        PhotonNetwork.ConnectUsingSettings("0.4");
+        joinRoom.GetComponentInChildren<Text>().text = "Join Or Create Room";
+    }
 
-	public void Menu1ToMenu2(){
+    public void Menu1ToMenu2(){
 		menu1.SetActive (false);
 		menu2.SetActive(true);
 		consoleWindow.SetActive (true);
@@ -79,11 +88,6 @@ public class SceneChanger : MonoBehaviour {
 		}
 		menu3.SetActive (false);
 		canvasBg.SetActive (false);
-
-		//toggle
-		if (singlePlayer) PhotonNetwork.offlineMode = true;
-		else PhotonNetwork.ConnectUsingSettings("0.3");
-
 
 	}
 }

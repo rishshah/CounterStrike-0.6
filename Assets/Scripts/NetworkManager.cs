@@ -21,7 +21,7 @@ public class NetworkManager : MonoBehaviour
 	//UI Info Console
 	Queue<string> messages;
 	public Text messageWindow;
-	const int messageCount = 5;
+	const int messageCount = 20;
 	PhotonView photonView;
 
 	//UI ScoreTab
@@ -43,7 +43,12 @@ public class NetworkManager : MonoBehaviour
 	public GameObject FPSPlayer;
 	GameObject player;
 
-	void Start()
+    //CT and T segregation
+    public GameObject CT;
+    public GameObject T;
+
+
+    void Start()
 	{
 		//general networking init
 		photonView = GetComponent<PhotonView> ();
@@ -101,58 +106,81 @@ public class NetworkManager : MonoBehaviour
 		connectionText.text = "";
 		StartSpawnProcess(0f);
 	}
-
-	void StartSpawnProcess(float respawnTime)
+    void EnableComponents()
+    {
+        //#pnm
+        player.GetComponent<Rigidbody>().useGravity = true;
+        player.GetComponent<FirstPersonController>().enabled = true;
+        player.GetComponent<UIManager>().enabled = true;
+        player.GetComponentInChildren<Canvas>().enabled = true;
+        player.GetComponent<AudioListener>().enabled = true;
+        player.GetComponentInChildren<PlayerShooting>().enabled = true;
+        foreach (Camera cam in player.GetComponentsInChildren<Camera>())
+            cam.enabled = true;
+        for (int i = 0; i < 4; i++)
+        {
+            player.transform.Find("FirstPersonCharacter/Camera/M4A1/Mesh_0011").GetChild(i).gameObject.layer = 11;
+        }
+        player.transform.Find("FirstPersonCharacter/Camera/M4A1/mag/Mesh_0012").gameObject.layer = 11;
+        player.transform.Find("FirstPersonCharacter/Camera/M4A1/mag").gameObject.layer = 11;
+        player.transform.Find("FirstPersonCharacter/Camera/M4A1/Mesh_0011").gameObject.layer = 11;
+        //#pnm
+    }
+    void StartSpawnProcess(float respawnTime)
 	{
 		sceneCamera.enabled = true;
 		StartCoroutine("SpawnPlayer", respawnTime);
 	}
 
-	IEnumerator SpawnPlayer(float respawnTime)
-	{
-		yield return new WaitForSeconds(respawnTime);
-		sceneCamera.enabled = false;
+    IEnumerator SpawnPlayer(float respawnTime)
+    {
+        yield return new WaitForSeconds(respawnTime);
+        sceneCamera.enabled = false;
 
-		int index = Random.Range(0, spawnPoints.Length);
-		if (!sc.singlePlayer) {
-			player = PhotonNetwork.Instantiate ("FPSPlayer", spawnPoints [index].position, spawnPoints [index].rotation, 0);
-		} 
-		else {
-			player = (GameObject)Instantiate (FPSPlayer, spawnPoints [index].position, spawnPoints [index].rotation);
-			//#pnm
-			player.GetComponent<Rigidbody> ().useGravity = true;
-			player.GetComponent<FirstPersonController> ().enabled = true;
-			player.GetComponent<UIManager> ().enabled = true;
-			player.GetComponent <AudioListener> ().enabled = true;
-			player.GetComponentInChildren<PlayerShooting> ().enabled = true;
-			foreach (Camera cam in player.GetComponentsInChildren<Camera>())
-				cam.enabled = true;
-			for (int i = 0; i < 4; i++) {
-				player.transform.Find ("FirstPersonCharacter/Camera/M4A1/Mesh_0011").GetChild (i).gameObject.layer = 11;
-			}
-			player.transform.Find ("FirstPersonCharacter/Camera/M4A1/mag/Mesh_0012").gameObject.layer = 11;
-			player.transform.Find ("FirstPersonCharacter/Camera/M4A1/mag").gameObject.layer = 11;
-			player.transform.Find ("FirstPersonCharacter/Camera/M4A1/Mesh_0011").gameObject.layer = 11;
-			//#pnm
-		}
-		player.transform.name = username .text;
+        int index = Random.Range(0, spawnPoints.Length);
+        if (!sc.singlePlayer)
+        {
+            player = PhotonNetwork.Instantiate("FPSPlayer", spawnPoints[index].position, spawnPoints[index].rotation, 0);
+        }
+        else
+        {
+            player = (GameObject)Instantiate(FPSPlayer, spawnPoints[index].position, spawnPoints[index].rotation);
+            //#pnm
+            EnableComponents();
+        }
+        player.transform.parent = CT.transform;
+        player.transform.name = username.text;
 
-		player.GetComponent<PlayerNetworkMover>().RespawnMe += StartSpawnProcess;
-		player.GetComponent<PlayerNetworkMover>().SendNetworkedMessage += AddMessage;
+        player.GetComponent<PlayerNetworkMover>().RespawnMe += StartSpawnProcess;
+        player.GetComponent<PlayerNetworkMover>().SendNetworkedMessage += AddMessage;
+        sm.SetScoreRPC += SetScore;
 
-		//console message for spawn
-		AddMessage("Spawned Player : " + PhotonNetwork.player.name);
+        //console message for spawn
+        AddMessage("Spawned Player : " + PhotonNetwork.player.name);
 
-		//score init
-		sm.SetScore (PhotonNetwork.player.name, "Kills", 0);
-		sm.SetScore (PhotonNetwork.player.name, "Deaths", 0);
-		sm.SetScore (PhotonNetwork.player.name, "Assists", 0);
-	}
+        //score init
+        sm.Init();
+        if (!sm.playerScores.ContainsKey(PhotonNetwork.player.name)) { 
+            SetScore(PhotonNetwork.player.name, "Kills", 0);
+        }
+    }
 
-	void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-	{
-	}
-
+    void SetScore(string username, string scoreType, int value)
+    {
+        photonView.RPC("SetScore_RPC", PhotonTargets.All, username, scoreType, value);
+    }
+    [PunRPC]
+    public void SetScore_RPC(string username, string scoreType, int value)
+    {
+        sm.Init();
+        sm.counter++;
+        if (sm.playerScores.ContainsKey(username) == false)
+        {
+            sm.playerScores[username] = new Dictionary<string, int>();
+        }
+        sm.playerScores[username][scoreType] = value;
+    }
+   
 	void AddMessage(string message)
 	{	
 		//toggle
@@ -178,7 +206,6 @@ public class NetworkManager : MonoBehaviour
 		}
 	}
 
-
 	void AddScore(){
 		if (sc.singlePlayer) {
 			string[] names = sm.GetPlayerNames ("Kills");
@@ -195,7 +222,6 @@ public class NetworkManager : MonoBehaviour
 		}
 		else 	photonView.RPC("AddScore_RPC", PhotonTargets.All);
 	}
-
 	[PunRPC]
 	void AddScore_RPC(){
 		string[] names = sm.GetPlayerNames ("Kills");
@@ -210,4 +236,17 @@ public class NetworkManager : MonoBehaviour
 			Deaths.text += sm.GetScore(name,"Deaths").ToString() + '\n';
 		}
 	}
+
+    void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        /* if (stream.isWriting)
+         {
+             stream.SendNext(sm.playerScores);
+         }
+         else
+         {
+             sm.playerScores = (Dictionary<string, Dictionary<string, int>>)stream.ReceiveNext();
+         }*/
+    }
+
 }

@@ -8,7 +8,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour
 
 	public delegate void Respawn(float time);
 	public event Respawn RespawnMe;
-	public delegate void SendMessage(string message);
+    public delegate void SendMessage(string message);
 	public event SendMessage SendNetworkedMessage;
 
 	Vector3 position;
@@ -17,9 +17,10 @@ public class PlayerNetworkMover : Photon.MonoBehaviour
 	public float health = 100f;
 
 	//Assist 
-	public ScoreManager sm;
-	Dictionary<string, float> damageRecord; 
-
+	Dictionary<string, float> damageRecord;
+    public ScoreManager sm;
+    //
+    public Canvas canvas;
 	void Start()
 	{
 
@@ -28,6 +29,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour
 			GetComponent<Rigidbody>().useGravity = true;
 			GetComponent<FirstPersonController>().enabled = true;
 			GetComponent<UIManager>().enabled = true;
+            canvas.enabled = true;
 			GetComponent <AudioListener>().enabled = true;
 			GetComponentInChildren<PlayerShooting>().enabled = true;
 			foreach (Camera cam in GetComponentsInChildren<Camera>())
@@ -104,18 +106,19 @@ public class PlayerNetworkMover : Photon.MonoBehaviour
 	{
 		health -= damage;
 		AddDamage(shootingPerson, damage);
-		if (health <= 0 && photonView.isMine)
+		if (health <= 0)
 		{
-			search(shootingPerson);
-			sm.ChangeScore(shootingPerson, "Kills", 1);
-			sm.ChangeScore(PhotonNetwork.player.name, "Deaths", 1);
-			if (SendNetworkedMessage != null)
-				SendNetworkedMessage (PhotonNetwork.player.name + " was killed by " + shootingPerson);
-			if (RespawnMe != null)
-				RespawnMe(3f);
-
-			PhotonNetwork.Destroy(gameObject);
-		}
+            search(shootingPerson);
+            sm.ChangeScore(shootingPerson, "Kills", 1);
+            if (photonView.isMine)
+            {
+                sm.ChangeScore(PhotonNetwork.player.name, "Deaths", 1);
+                if (SendNetworkedMessage != null)
+                    SendNetworkedMessage(PhotonNetwork.player.name + " was killed by " + shootingPerson);
+                if (RespawnMe != null)
+                    RespawnMe(3f);
+                PhotonNetwork.Destroy(gameObject);
+            }
+        }
 	}
-
 }

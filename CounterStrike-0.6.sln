@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2015
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CounterStrike-0.6.CSharp.Plugins", "CounterStrike-0.6.CSharp.Plugins.csproj", "{9B0DC3C1-BE13-F043-B5F2-183EBEC30779}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CounterStrike-0.6.CSharp", "CounterStrike-0.6.CSharp.csproj", "{A67B2AAC-5B2B-AFCF-173F-30D9C3103F82}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CounterStrike-0.6.CSharp.Editor", "CounterStrike-0.6.CSharp.Editor.csproj", "{76AA4168-5DBF-BDA7-0362-2E09331419FD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9B0DC3C1-BE13-F043-B5F2-183EBEC30779}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B0DC3C1-BE13-F043-B5F2-183EBEC30779}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B0DC3C1-BE13-F043-B5F2-183EBEC30779}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B0DC3C1-BE13-F043-B5F2-183EBEC30779}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A67B2AAC-5B2B-AFCF-173F-30D9C3103F82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A67B2AAC-5B2B-AFCF-173F-30D9C3103F82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A67B2AAC-5B2B-AFCF-173F-30D9C3103F82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A67B2AAC-5B2B-AFCF-173F-30D9C3103F82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76AA4168-5DBF-BDA7-0362-2E09331419FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76AA4168-5DBF-BDA7-0362-2E09331419FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76AA4168-5DBF-BDA7-0362-2E09331419FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76AA4168-5DBF-BDA7-0362-2E09331419FD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

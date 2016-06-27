@@ -3,16 +3,20 @@ using System.Collections;
 using UnityEngine.UI;
 public class UIManager : MonoBehaviour {
 
-	public Text time;
+    public GameObject normalWindow;
+    public Text time;
 	public Text bullets;
 	public Text health;
+
 	public PlayerShooting ps;
 	public PlayerNetworkMover pnm;
-	int minutes;
+
+    int minutes;
 	int seconds;
 	float timesec;
 	float Roundtime = 600f;
-	// Use this for initialization
+	
+    // Use this for initialization
 	void Start()
 	{
 		timesec = Roundtime;
@@ -20,7 +24,6 @@ public class UIManager : MonoBehaviour {
 		Displaytime();
 		bullets.text = ps.bulletsInMagzin.ToString() + "/" + ps.bulletsOutMagzin.ToString();
 		health.text = pnm.health.ToString();    
-
 	}
 	void Displaytime()
 	{   
@@ -36,6 +39,7 @@ public class UIManager : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+        normalWindow.SetActive(!Input.GetKey(KeyCode.Tab));
 		timesec -= Time.deltaTime;
 		TimeConvert();
 		Displaytime();
