@@ -25,8 +25,12 @@ public class SceneChanger : MonoBehaviour {
 
 	//CT and T segregation
 	public bool isPlayerCT=false; 
+
 	public InputField numOfCTBots;
 	public InputField numOfTBots;
+	int valCT;
+	int valT;
+
 
 	public bool singlePlayer = false;
 
@@ -89,8 +93,7 @@ public class SceneChanger : MonoBehaviour {
 	}
 
 	public void Menu3ToPlaySite(){
-		int val;
-		if(!int.TryParse(ctBots.text,out val) || !int.TryParse(tBots.text,out val)){
+		if(!int.TryParse(ctBots.text,out valCT)|| !int.TryParse(tBots.text,out valT)){
 			error.SetActive(true);
 			return;
 		}
@@ -101,9 +104,16 @@ public class SceneChanger : MonoBehaviour {
 
 	public void CTInit(){
 		isPlayerCT = true;
+
 	}
-
-	public void TInit(){
-
+	public void BotInitSpawn(){
+		for (int i = 0; i < valCT; i++) {
+			string s = "BOT CT: " + (i+1).ToString ();	
+			nm.StartSpawnProcess(3f, true, true,s);
+		}
+		for (int i = 0; i < valT; i++) {
+			string s = "BOT T: " + (i+1).ToString ();
+			nm.StartSpawnProcess(3f, true, false,s);
+		}
 	}
 }

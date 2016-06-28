@@ -40,7 +40,7 @@ public class UIManager : MonoBehaviour {
     {
         for (int i = 0; i < CT.transform.childCount; i++)
         {
-            if (CT.transform.GetChild(i).gameObject.GetPhotonView().isMine)
+			if (CT.transform.GetChild(i).gameObject.GetPhotonView().isMine && !CT.transform.GetChild(i).gameObject.GetComponent<PlayerNetworkMover>().isBot)
             {
                 pnm = CT.transform.GetChild(i).gameObject.GetComponent<PlayerNetworkMover>();
                 ps = CT.transform.GetChild(i).gameObject.GetComponentInChildren<PlayerShooting>();
@@ -54,7 +54,7 @@ public class UIManager : MonoBehaviour {
 
 		for (int i = 0; i < T.transform.childCount; i++)
 		{
-			if (T.transform.GetChild(i).gameObject.GetPhotonView().isMine)
+			if (T.transform.GetChild(i).gameObject.GetPhotonView().isMine && !CT.transform.GetChild(i).gameObject.GetComponent<PlayerNetworkMover>().isBot)
 			{
 				pnm = T.transform.GetChild(i).gameObject.GetComponent<PlayerNetworkMover>();
 				ps = T.transform.GetChild(i).gameObject.GetComponentInChildren<PlayerShooting>();

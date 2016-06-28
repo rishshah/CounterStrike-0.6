@@ -6,7 +6,7 @@ using System.Collections.Generic;
 public class PlayerNetworkMover : Photon.MonoBehaviour
 {
 
-	public delegate void Respawn(float time);
+	public delegate void Respawn(float respawnTime, bool isBot, bool isPlayerCT, string name);
 	public event Respawn RespawnMe;
     public delegate void SendMessage(string message);
 	public event SendMessage SendNetworkedMessage;
@@ -22,14 +22,13 @@ public class PlayerNetworkMover : Photon.MonoBehaviour
    
 	//AI
 	public bool isBot;
-
+	public bool isCT;
 	void Start()
 	{
 
 		if (photonView.isMine && !isBot)
 		{
             health = 100f;
-			GetComponent<Rigidbody>().useGravity = true;
 			GetComponent<FirstPersonController>().enabled = true;
 			GetComponent <AudioListener>().enabled = true;
 			GetComponentInChildren<PlayerShooting>().enabled = true;
@@ -75,7 +74,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour
 		}
 	}
 
-	void AddDamage(string playerShooting , float damage)
+	public void AddDamage(string playerShooting , float damage)
 	{	
 		if (damageRecord == null) {
 			damageRecord = new Dictionary<string, float>();
@@ -87,7 +86,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour
 			damageRecord.Add (playerShooting, damage);
 		}
 	}
-	void search(string playerKilling)
+	public void search(string playerKilling)
 	{
 		Debug.Log (playerKilling + "insarch");
 		string assistPlayer="";
@@ -117,7 +116,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour
                 if (SendNetworkedMessage != null)
                     SendNetworkedMessage(PhotonNetwork.player.name + " was killed by " + shootingPerson);
                 if (RespawnMe != null)
-                    RespawnMe(3f);
+					RespawnMe(3f,false,isCT,PhotonNetwork.player.name);
                 PhotonNetwork.Destroy(gameObject);
             }
         }

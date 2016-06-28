@@ -54,14 +54,10 @@ public class NetworkManager : MonoBehaviour
     //CT and T segregation
     public GameObject CT;
     public GameObject T;
-	Color blue= new Color(17,255,255);
-	Color red= new Color(203,70,70);
+	Color BLUE= new Color(0.067f,1f,1f);
+	Color RED= new Color(0.796f,0.2745f,0.2745f);
 
-	//bots spawning
-	public InputField numCT;
-	public InputField numT;
-
-    void Start()
+	void Start()
 	{
 		//general networking init
 		photonView = GetComponent<PhotonView> ();
@@ -118,50 +114,39 @@ public class NetworkManager : MonoBehaviour
 	{	
 		isJoinedRoom =true;
 		connectionText.text = "";
-		StartSpawnProcess(0f);
+		StartSpawnProcess(0f, false, sc.isPlayerCT, username.text);
+		sc.BotInitSpawn ();
+
 	}
     
-    void StartSpawnProcess(float respawnTime)
+	public void StartSpawnProcess(float respawnTime, bool isBot, bool isPlayerCT, string name)
 	{
 		sceneCamera.enabled = true;
-		StartCoroutine(SpawnPlayer(respawnTime,false,sc.isPlayerCT,username.text));
-
-		int valCT, valT;
-		Debug.Log ("T: " + numT.text + " CT: " + numCT.text);
-		if (int.TryParse (numT.text, out valT)) {
-			for (int i = 0; i < valT; i++) {
-				string s = "BOT CT: " + i.ToString ();	
-				StartCoroutine (SpawnPlayer( respawnTime, true, false,s));
-			}
-		}
-		if (int.TryParse (numCT.text, out valCT)) {
-			for (int i = 0; i < valCT; i++) {
-				string s = "BOT T: " + i.ToString ();
-				StartCoroutine (SpawnPlayer(respawnTime, true, true,s));
-			}
-		}
+		StartCoroutine(SpawnPlayer(respawnTime, isBot, isPlayerCT, name));
 	}
 
-	IEnumerator SpawnPlayer(float respawnTime , bool  isBot, bool  isPlayerCT,string name)
+	IEnumerator SpawnPlayer(float respawnTime, bool isBot, bool isPlayerCT,string name)
     {	
-		sceneCamera.enabled = false;
         yield return new WaitForSeconds(respawnTime);
-        
+		sceneCamera.enabled = false;
+
 		//#toggle & #segregation spawning
         int CTindex = Random.Range(0, CTspawnPoints.Length);
 		int Tindex = Random.Range(0, TspawnPoints.Length);
 
 		if (isPlayerCT) {
 			player = PhotonNetwork.Instantiate ("FPSPlayer", CTspawnPoints [CTindex].position, CTspawnPoints [CTindex].rotation, 0);
+			player.gameObject.GetComponent<PlayerNetworkMover> ().isCT = true;
 			player.transform.parent = CT.transform;
-			player.transform.Find("Body").GetComponent<MeshRenderer> ().material.color = blue;
-			player.transform.Find ("Head/Cap").GetComponent<MeshRenderer> ().material.color = blue;
+			player.transform.GetChild(0).GetComponent<MeshRenderer> ().material.color = BLUE;
+			player.transform.GetChild (2).transform.GetChild (2).GetComponent<MeshRenderer> ().material.color = BLUE;
 		} 
-		else if (!isPlayerCT) {
+		else{
 			player = PhotonNetwork.Instantiate ("FPSPlayer", TspawnPoints [Tindex].position, TspawnPoints [Tindex].rotation, 0);
+			player.gameObject.GetComponent<PlayerNetworkMover> ().isCT = false;
 			player.transform.parent = T.transform;
-			player.transform.Find("Body").GetComponent<MeshRenderer> ().material.color = red;
-			player.transform.Find ("Head/Cap").GetComponent<MeshRenderer> ().material.color = red;
+			player.transform.GetChild(0).GetComponent<MeshRenderer> ().material.color = RED;
+			player.transform.GetChild(2).transform.GetChild(2).GetComponent<MeshRenderer> ().material.color = RED;
 		}
 		player.transform.name = name;
 
@@ -174,6 +159,9 @@ public class NetworkManager : MonoBehaviour
 		player.GetComponent<PlayerNetworkMover>().RespawnMe += StartSpawnProcess;
 		player.GetComponent<PlayerNetworkMover>().SendNetworkedMessage += AddMessage;
 		sm.SetScoreRPC += SetScore;
+		player.GetComponentInChildren<PlayerShooting>().RespawnMe += StartSpawnProcess;
+		player.GetComponentInChildren<PlayerShooting>().SendNetworkedMessage += AddMessage;
+
 
 		//console message for spawn
         AddMessage("Spawned Player : " + name);

@@ -28,6 +28,10 @@ public class PlayerShooting : MonoBehaviour
 	bool isAiming = false;
 	public bool reloading = false;
 
+	public delegate void Respawn1(float respawnTime, bool isBot, bool isPlayerCT, string name);
+	public event Respawn1 RespawnMe;
+	public delegate void SendMessage1(string message);
+	public event SendMessage1 SendNetworkedMessage;
 	// Use this for initialization
 	void Start()
 	{
@@ -49,22 +53,17 @@ public class PlayerShooting : MonoBehaviour
 		if (!reloading) isAiming = Input.GetKey(KeyCode.Mouse1);
 		anim.SetBool("isAiming", isAiming);
 
-		if (timeSinceShot>=minTimeBWShots)
-		{
-            if (reloading)
-            {
-
-                if (bulletsOutMagzin >= magzinSize - bulletsInMagzin)
-                {
-                    bulletsOutMagzin -= (magzinSize - bulletsInMagzin);
-                    bulletsInMagzin = magzinSize;
-                }
-                else
-                {
-                    bulletsInMagzin += bulletsOutMagzin;
-                    bulletsOutMagzin = 0;
-                }
-            }
+		if (timeSinceShot>=minTimeBWShots){
+			if (reloading){
+			    if (bulletsOutMagzin >= magzinSize - bulletsInMagzin){
+                bulletsOutMagzin -= (magzinSize - bulletsInMagzin);
+                bulletsInMagzin = magzinSize;
+	            }
+	            else{
+	                bulletsInMagzin += bulletsOutMagzin;
+	                bulletsOutMagzin = 0;
+	            }
+	        }
 			reloading = false;
             anim.SetBool("Reloading", false);
             if (Input.GetKey(KeyCode.Mouse0) && !Input.GetKey(KeyCode.LeftShift) && bulletsInMagzin > 0)
@@ -109,13 +108,16 @@ public class PlayerShooting : MonoBehaviour
 			{
 				//bloodParticles.transform.position = hit.point;
 				//bloodParticles.GetComponent<ParticleSystem>().Play();
-				if (hit.collider.tag == "Body")
-				{
-					impacts[currentImpact].transform.position = hit.point;
-					impacts[currentImpact].GetComponent<ParticleSystem>().Play();
+				if (hit.collider.tag == "Body") {
+					impacts [currentImpact].transform.position = hit.point;
+					impacts [currentImpact].GetComponent<ParticleSystem> ().Play ();
 					if (++currentImpact >= maxImpacts)
 						currentImpact = 0;
-					hit.transform.GetComponentInParent<PhotonView>().RPC("GetShot", PhotonTargets.All, damageBody,PhotonNetwork.player.name);
+					
+					if (hit.transform.gameObject.GetComponent<PlayerNetworkMover> ().isBot) {
+						RPCBots (hit,damageBody);
+					}
+					else hit.transform.GetComponentInParent<PhotonView>().RPC("GetShot", PhotonTargets.All, damageBody,PhotonNetwork.player.name);
 				}
 				else if (hit.collider.tag == "Head")
 				{
@@ -123,9 +125,36 @@ public class PlayerShooting : MonoBehaviour
 					impacts[currentImpact].GetComponent<ParticleSystem>().Play();
 					if (++currentImpact >= maxImpacts)
 						currentImpact = 0;
-					hit.transform.GetComponentInParent<PhotonView>().RPC("GetShot", PhotonTargets.All, damageHead,PhotonNetwork.player.name);
+					if (hit.transform.gameObject.GetComponent<PlayerNetworkMover> ().isBot) {
+						RPCBots (hit,damageBody);
+					}
+					else hit.transform.GetComponentInParent<PhotonView>().RPC("GetShot", PhotonTargets.All, damageHead,PhotonNetwork.player.name);
 				}
 			}
+		}
+	}
+
+	void RPCBots(RaycastHit hit,float damage){
+		PlayerNetworkMover localPNM = hit.transform.gameObject.GetComponent<PlayerNetworkMover> ();
+		string shootingPlayer = PhotonNetwork.player.name;
+		string dyingPlayer = hit.transform.gameObject.name;
+
+		localPNM.health -= damage;
+		localPNM.AddDamage (shootingPlayer, damage);
+		if (localPNM.health <= 0) {
+			localPNM.search (shootingPlayer);
+			localPNM.sm.ChangeScore (shootingPlayer, "Kills", 1);
+			localPNM.sm.ChangeScore (shootingPlayer, "Deaths", 1);
+			if (SendNetworkedMessage != null)
+				SendNetworkedMessage (dyingPlayer + " was killed by " + shootingPlayer);
+			if (RespawnMe != null){
+				Debug.Log ("!!!!" + dyingPlayer);
+				RespawnMe (3f, true, localPNM.isCT, dyingPlayer);
+			}
+			else{
+				Debug.Log ("!!!!! Not" + dyingPlayer);
+			}
+			PhotonNetwork.Destroy (hit.transform.gameObject.GetComponent<PhotonView> ());
 		}
 	}
 
