@@ -81,10 +81,11 @@ public class NetworkManager : MonoBehaviour
 			return;
 		lastChangeCounter = sm.counter;
 
-		AddScore();
-	}
+        //AddScore();
+        AddScore();
+    }
 
-	void OnJoinedLobby()
+    void OnJoinedLobby()
 	{
 		isJoinedLobby = true;
 	}
@@ -97,7 +98,8 @@ public class NetworkManager : MonoBehaviour
 			roomlist.text += room.name + '\n';
 		}
 	}
-	public void JoinRoom()
+
+    public void JoinRoom()
 	{	PhotonNetwork.player.name = username.text;
 		
 		//toggle
@@ -153,6 +155,7 @@ public class NetworkManager : MonoBehaviour
 			player.transform.Find("Head").GetComponent<MeshRenderer> ().material.color = red ;
 
 		}
+
 		//DELEGATE NOTING
 		player.GetComponent<PlayerNetworkMover>().RespawnMe += StartSpawnProcess;
 		player.GetComponent<PlayerNetworkMover>().SendNetworkedMessage += AddMessage;
@@ -166,12 +169,45 @@ public class NetworkManager : MonoBehaviour
         sm.Init();
         if (!sm.playerScores.ContainsKey(PhotonNetwork.player.name)) { 
 			SetScore(PhotonNetwork.player.name, "Kills", 0);
-			if (sc.isPlayerCT)	sm.playerScores [PhotonNetwork.player.name] ["Team"] = 1;
-			else 	sm.playerScores [PhotonNetwork.player.name] ["Team"] = 0;   
-		}
+            SetScore(PhotonNetwork.player.name, "Assists", 0);
+            SetScore(PhotonNetwork.player.name, "Deaths", 0);
+            if (sc.isPlayerCT) SetScore(PhotonNetwork.player.name, "Team", 1);
+			else 	SetScore(PhotonNetwork.player.name, "Team", 0);
+        }
     }
-	//################################################ HELPER FN NOT NETWORK RELATED ###################################################
-	void EnableComponents()
+
+    //DISPLAY SCORE  ###### NOT AN RPC
+    void AddScore()
+    {
+        string[] CTnames = sm.GetPlayerNamesCT("Kills");
+        CTusernameScore.text = "";
+        CTKills.text = "";
+        CTAssists.text = "";
+        CTDeaths.text = "";
+        foreach (string name in CTnames)
+        {
+            CTusernameScore.text += name + '\n';
+            CTKills.text += sm.GetScore(name, "Kills").ToString() + '\n';
+            CTAssists.text += sm.GetScore(name, "Assists").ToString() + '\n';
+            CTDeaths.text += sm.GetScore(name, "Deaths").ToString() + '\n';
+        }
+
+        string[] Tnames = sm.GetPlayerNamesT("Kills");
+        TusernameScore.text = "";
+        TKills.text = "";
+        TAssists.text = "";
+        TDeaths.text = "";
+        foreach (string name in Tnames)
+        {
+            TusernameScore.text += name + '\n';
+            TKills.text += sm.GetScore(name, "Kills").ToString() + '\n';
+            TAssists.text += sm.GetScore(name, "Assists").ToString() + '\n';
+            TDeaths.text += sm.GetScore(name, "Deaths").ToString() + '\n';
+        }
+    }
+    //################################################ HELPER FN NOT NETWORK RELATED ###################################################
+
+    void EnableComponents()
 	{
 		//#pnm
 		player.GetComponent<Rigidbody>().useGravity = true;
@@ -193,12 +229,13 @@ public class NetworkManager : MonoBehaviour
 	void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
 	{
 	}
-	//################################################ RPCS AND thEIR HELPER FN ###################################################
+	
+    //################################################ RPCS AND thEIR HELPER FN ###################################################
 
 	//SETSCORE RPC
 	void SetScore(string username, string scoreType, int value)
     {
-        photonView.RPC("SetScore_RPC", PhotonTargets.All, username, scoreType, value);
+        photonView.RPC("SetScore_RPC", PhotonTargets.AllBuffered, username, scoreType, value);
     }
     [PunRPC]
     public void SetScore_RPC(string username, string scoreType, int value)
@@ -234,40 +271,5 @@ public class NetworkManager : MonoBehaviour
 		ShortAddMessage (message);
 	}
 
-	//DISPLAY SCORE RPC
-	void ShortAddScore(){
-		string[] CTnames = sm.GetPlayerNamesCT ("Kills");
-		CTusernameScore.text = "";
-		CTKills.text = "";
-		CTAssists.text = "";
-		CTDeaths.text = "";
-		foreach (string name in CTnames) {
-			CTusernameScore.text += name + '\n';
-			CTKills.text += sm.GetScore (name, "Kills").ToString () + '\n';
-			CTAssists.text += sm.GetScore (name, "Assists").ToString () + '\n';
-			CTDeaths.text += sm.GetScore (name, "Deaths").ToString () + '\n';
-		}
 	
-		string[] Tnames = sm.GetPlayerNamesT ("Kills");
-		TusernameScore.text = "";
-		TKills.text = "";
-		TAssists.text = "";
-		TDeaths.text = "";
-		foreach (string name in Tnames) {
-			TusernameScore.text += name + '\n';
-			TKills.text += sm.GetScore (name, "Kills").ToString () + '\n';
-			TAssists.text += sm.GetScore (name, "Assists").ToString () + '\n';
-			TDeaths.text += sm.GetScore (name, "Deaths").ToString () + '\n';
-		}
-	}
-	void AddScore(){
-		if (sc.singlePlayer) {
-			ShortAddScore ();	
-		}
-		else 	photonView.RPC("AddScore_RPC", PhotonTargets.All);
-	}
-	[PunRPC]
-	void AddScore_RPC(){
-		ShortAddScore ();
-	}
 }

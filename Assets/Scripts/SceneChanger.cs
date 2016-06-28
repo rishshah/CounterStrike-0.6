@@ -50,6 +50,7 @@ public class SceneChanger : MonoBehaviour {
         joinRoom.enabled = true;
 		joinRoom.GetComponentInChildren<Text>().text="Create Room";
 	}
+
     public void EnableMultiPlayer()
     {
         singlePlayer = false;

@@ -25,11 +25,12 @@ public class PlayerNetworkMover : Photon.MonoBehaviour
 
 		if (photonView.isMine)
 		{
+            health = 100f;
 			GetComponent<Rigidbody>().useGravity = true;
 			GetComponent<FirstPersonController>().enabled = true;
 			GetComponent <AudioListener>().enabled = true;
 			GetComponentInChildren<PlayerShooting>().enabled = true;
-            GetComponent<PowerUp>().enabled = true;
+            //GetComponent<PowerUp>().enabled = true;
 			foreach (Camera cam in GetComponentsInChildren<Camera>())
 				cam.enabled = true;
 			for(int i=0; i<4; i++)
@@ -78,9 +79,8 @@ public class PlayerNetworkMover : Photon.MonoBehaviour
 		}	
 		if (damageRecord.ContainsKey (playerShooting) ) {
 			damageRecord [playerShooting] += damage;
-
-		} else {
-			Debug.Log (playerShooting);
+		}
+        else {
 			damageRecord.Add (playerShooting, damage);
 		}
 	}
