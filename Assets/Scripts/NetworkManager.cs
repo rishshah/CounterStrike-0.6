@@ -54,8 +54,12 @@ public class NetworkManager : MonoBehaviour
     //CT and T segregation
     public GameObject CT;
     public GameObject T;
-	Color blue= new Color(0,0,255);
-	Color red= new Color(255,0,0);
+	Color blue= new Color(17,255,255);
+	Color red= new Color(203,70,70);
+
+	//bots spawning
+	public InputField numCT;
+	public InputField numT;
 
     void Start()
 	{
@@ -101,7 +105,6 @@ public class NetworkManager : MonoBehaviour
 
     public void JoinRoom()
 	{	PhotonNetwork.player.name = username.text;
-		
 		//toggle
 		if (sc.singlePlayer)
 			PhotonNetwork.JoinRoom (roomname.text);
@@ -121,58 +124,68 @@ public class NetworkManager : MonoBehaviour
     void StartSpawnProcess(float respawnTime)
 	{
 		sceneCamera.enabled = true;
-		StartCoroutine("SpawnPlayer", respawnTime);
+		StartCoroutine(SpawnPlayer(respawnTime,false,sc.isPlayerCT,username.text));
+
+		int valCT, valT;
+		Debug.Log ("T: " + numT.text + " CT: " + numCT.text);
+		if (int.TryParse (numT.text, out valT)) {
+			for (int i = 0; i < valT; i++) {
+				string s = "BOT CT: " + i.ToString ();	
+				StartCoroutine (SpawnPlayer( respawnTime, true, false,s));
+			}
+		}
+		if (int.TryParse (numCT.text, out valCT)) {
+			for (int i = 0; i < valCT; i++) {
+				string s = "BOT T: " + i.ToString ();
+				StartCoroutine (SpawnPlayer(respawnTime, true, true,s));
+			}
+		}
 	}
 
-    IEnumerator SpawnPlayer(float respawnTime)
-    {
+	IEnumerator SpawnPlayer(float respawnTime , bool  isBot, bool  isPlayerCT,string name)
+    {	
+		sceneCamera.enabled = false;
         yield return new WaitForSeconds(respawnTime);
-        sceneCamera.enabled = false;
-
+        
 		//#toggle & #segregation spawning
         int CTindex = Random.Range(0, CTspawnPoints.Length);
 		int Tindex = Random.Range(0, TspawnPoints.Length);
 
-		if (!sc.singlePlayer)  {
-			player = PhotonNetwork.Instantiate("FPSPlayer", CTspawnPoints[CTindex].position, CTspawnPoints[CTindex].rotation, 0);
-	    }
-        else {
-			player = (GameObject)Instantiate(FPSPlayer, CTspawnPoints[CTindex].position, CTspawnPoints[CTindex].rotation);
-	        //#pnm
-            EnableComponents();
-        }
-		player.transform.name = username.text;
-
-		//segregation
-		if (sc.isPlayerCT) {
+		if (isPlayerCT) {
+			player = PhotonNetwork.Instantiate ("FPSPlayer", CTspawnPoints [CTindex].position, CTspawnPoints [CTindex].rotation, 0);
 			player.transform.parent = CT.transform;
-			player.transform.Find ("Body").GetComponent<MeshRenderer> ().material.color = blue;
-			player.transform.Find ("Head").GetComponent<MeshRenderer> ().material.color = blue;
+			player.transform.Find("Body").GetComponent<MeshRenderer> ().material.color = blue;
+			player.transform.Find ("Head/Cap").GetComponent<MeshRenderer> ().material.color = blue;
 		} 
-		else {
+		else if (!isPlayerCT) {
+			player = PhotonNetwork.Instantiate ("FPSPlayer", TspawnPoints [Tindex].position, TspawnPoints [Tindex].rotation, 0);
 			player.transform.parent = T.transform;
-			player.transform.Find("Body").GetComponent<MeshRenderer> ().material.color = red  ;
-			player.transform.Find("Head").GetComponent<MeshRenderer> ().material.color = red ;
-
+			player.transform.Find("Body").GetComponent<MeshRenderer> ().material.color = red;
+			player.transform.Find ("Head/Cap").GetComponent<MeshRenderer> ().material.color = red;
 		}
+		player.transform.name = name;
 
+		if (!isBot) 
+			player.GetComponent<PlayerNetworkMover> ().isBot = false;
+		else 
+			player.GetComponent<PlayerNetworkMover> ().isBot = true;
+		
 		//DELEGATE NOTING
 		player.GetComponent<PlayerNetworkMover>().RespawnMe += StartSpawnProcess;
 		player.GetComponent<PlayerNetworkMover>().SendNetworkedMessage += AddMessage;
 		sm.SetScoreRPC += SetScore;
 
-        
 		//console message for spawn
-        AddMessage("Spawned Player : " + PhotonNetwork.player.name);
+        AddMessage("Spawned Player : " + name);
 
         //score init
         sm.Init();
-        if (!sm.playerScores.ContainsKey(PhotonNetwork.player.name)) { 
-			SetScore(PhotonNetwork.player.name, "Kills", 0);
-            SetScore(PhotonNetwork.player.name, "Assists", 0);
-            SetScore(PhotonNetwork.player.name, "Deaths", 0);
-            if (sc.isPlayerCT) SetScore(PhotonNetwork.player.name, "Team", 1);
-			else 	SetScore(PhotonNetwork.player.name, "Team", 0);
+        if (!sm.playerScores.ContainsKey(name)) { 
+			SetScore(name, "Kills", 0);
+            SetScore(name, "Assists", 0);
+            SetScore(name, "Deaths", 0);
+            if (isPlayerCT) SetScore(name, "Team", 1);
+			else 	SetScore(name, "Team", 0);
         }
     }
 
@@ -205,31 +218,10 @@ public class NetworkManager : MonoBehaviour
             TDeaths.text += sm.GetScore(name, "Deaths").ToString() + '\n';
         }
     }
-    //################################################ HELPER FN NOT NETWORK RELATED ###################################################
-
-    void EnableComponents()
-	{
-		//#pnm
-		player.GetComponent<Rigidbody>().useGravity = true;
-		player.GetComponent<FirstPersonController>().enabled = true;
-		player.GetComponent<AudioListener>().enabled = true;
-		player.GetComponentInChildren<PlayerShooting>().enabled = true;
-        player. GetComponent<PowerUp>().enabled = true;
-        foreach (Camera cam in player.GetComponentsInChildren<Camera>())
-			cam.enabled = true;
-		for (int i = 0; i < 4; i++){
-			player.transform.Find("FirstPersonCharacter/Camera/M4A1/Mesh_0011").GetChild(i).gameObject.layer = 11;
-		}
-		player.transform.Find("FirstPersonCharacter/Camera/M4A1/mag/Mesh_0012").gameObject.layer = 11;
-		player.transform.Find("FirstPersonCharacter/Camera/M4A1/mag").gameObject.layer = 11;
-		player.transform.Find("FirstPersonCharacter/Camera/M4A1/Mesh_0011").gameObject.layer = 11;
-		//#pnm
-	}
-		
+   	
 	void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
 	{
 	}
-	
     //################################################ RPCS AND thEIR HELPER FN ###################################################
 
 	//SETSCORE RPC
@@ -269,7 +261,5 @@ public class NetworkManager : MonoBehaviour
 	[PunRPC]
 	void AddMessage_RPC(string message){
 		ShortAddMessage (message);
-	}
-
-	
+	}	
 }

@@ -20,17 +20,20 @@ public class PlayerNetworkMover : Photon.MonoBehaviour
 	Dictionary<string, float> damageRecord;
     public ScoreManager sm;
    
+	//AI
+	public bool isBot;
+
 	void Start()
 	{
 
-		if (photonView.isMine)
+		if (photonView.isMine && !isBot)
 		{
             health = 100f;
 			GetComponent<Rigidbody>().useGravity = true;
 			GetComponent<FirstPersonController>().enabled = true;
 			GetComponent <AudioListener>().enabled = true;
 			GetComponentInChildren<PlayerShooting>().enabled = true;
-            //GetComponent<PowerUp>().enabled = true;
+            GetComponent<PowerUp>().enabled = true;
 			foreach (Camera cam in GetComponentsInChildren<Camera>())
 				cam.enabled = true;
 			for(int i=0; i<4; i++)
