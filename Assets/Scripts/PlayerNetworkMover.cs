@@ -8,7 +8,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour
 
 	public delegate void Respawn(float respawnTime, bool isBot, bool isPlayerCT, string name);
 	public event Respawn RespawnMe;
-    public delegate void SendMessage(string message);
+    public delegate void SendMessage(string message,string color);
 	public event SendMessage SendNetworkedMessage;
 
 	Vector3 position;
@@ -24,6 +24,18 @@ public class PlayerNetworkMover : Photon.MonoBehaviour
 	public bool isCT;
 	public bool isBot;
 
+	public void SetGunLayer(int layer){
+
+		transform.Find("FirstPersonCharacter/Camera/M4A1/Mesh_0011").gameObject.layer = layer;
+		for(int i=0; i<4; i++)
+		{
+			transform.Find("FirstPersonCharacter/Camera/M4A1/Mesh_0011").GetChild(i).gameObject.layer = layer;
+		}
+
+		transform.Find("FirstPersonCharacter/Camera/M4A1/mag/Mesh_0012").gameObject.layer = layer;
+		transform.Find("FirstPersonCharacter/Camera/M4A1/mag").gameObject.layer = layer;
+	}
+		
 	void Start()
 	{
 
@@ -36,13 +48,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour
             GetComponent<PowerUp>().enabled = true;
 			foreach (Camera cam in GetComponentsInChildren<Camera>())
 				cam.enabled = true;
-			for(int i=0; i<4; i++)
-			{
-				transform.Find("FirstPersonCharacter/Camera/M4A1/Mesh_0011").GetChild(i).gameObject.layer = 11;
-			}
-			transform.Find("FirstPersonCharacter/Camera/M4A1/mag/Mesh_0012").gameObject.layer = 11;
-			transform.Find("FirstPersonCharacter/Camera/M4A1/mag").gameObject.layer = 11;
-			transform.Find("FirstPersonCharacter/Camera/M4A1/Mesh_0011").gameObject.layer = 11;
+			SetGunLayer (11);
 			Debug.Log (transform.name + " :: " + transform.position.y.ToString ());
 
 		}
@@ -123,9 +129,13 @@ public class PlayerNetworkMover : Photon.MonoBehaviour
             if (photonView.isMine)
             {
                 sm.ChangeScore(PhotonNetwork.player.name, "Deaths", 1);
-                if (SendNetworkedMessage != null)
-                    SendNetworkedMessage(PhotonNetwork.player.name + " was killed by " + shootingPerson);
-                if (RespawnMe != null)
+				if (SendNetworkedMessage != null){	
+					string color = "Red";
+					if (sm.playerScores [shootingPerson] ["Team"] == 1)
+						color = "Blue";
+					SendNetworkedMessage( shootingPerson + " => " + PhotonNetwork.player.name,color);
+				}
+				if (RespawnMe != null)
 					RespawnMe(3f,false,isCT,PhotonNetwork.player.name);
                 PhotonNetwork.Destroy(gameObject);
             }

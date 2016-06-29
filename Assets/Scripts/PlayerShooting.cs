@@ -30,7 +30,7 @@ public class PlayerShooting : MonoBehaviour
 
 	public delegate void Respawn(float respawnTime, bool isBot, bool isPlayerCT, string name);
 	public event Respawn RespawnMe;
-	public delegate void SendMessage(string message);
+	public delegate void SendMessage(string message,string color);
 	public event SendMessage SendNetworkedMessage;
 	// Use this for initialization
 	void Start()
@@ -145,8 +145,12 @@ public class PlayerShooting : MonoBehaviour
 			localPNM.search (shootingPlayer);
 			localPNM.sm.ChangeScore (shootingPlayer, "Kills", 1);
 			localPNM.sm.ChangeScore (dyingPlayer, "Deaths", 1);
-			if (SendNetworkedMessage != null)
-				SendNetworkedMessage (dyingPlayer + " was killed by " + shootingPlayer);
+			if (SendNetworkedMessage != null){
+				string color = "Red";
+				if (localPNM.sm.playerScores[shootingPlayer]["Team"]==1)
+					color = "Blue";
+				SendNetworkedMessage (shootingPlayer + " => " + dyingPlayer, color);
+			}
 			if (RespawnMe != null){
 				RespawnMe (3f, true, localPNM.isCT, dyingPlayer);
 			}

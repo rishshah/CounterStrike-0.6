@@ -23,7 +23,7 @@ public class NetworkManager : MonoBehaviour
 	//UI Info Console
 	Queue<string> messages;
 	public Text messageWindow;
-	const int messageCount = 20;
+	const int messageCount = 7;
 	PhotonView photonView;
 
 	//UI ScoreTab
@@ -172,7 +172,7 @@ public class NetworkManager : MonoBehaviour
 
 
 		//console message for spawn
-        AddMessage("Spawned Player : " + name);
+        AddMessage("Spawned Player : " + name,"black");
 
         //score init
         sm.Init();
@@ -237,7 +237,8 @@ public class NetworkManager : MonoBehaviour
     }
 
 	//CONSOLE MESSAGE RPC
-	void ShortAddMessage(string message){
+	void ShortAddMessage(string message,string color){
+
 		messages.Enqueue (message);
 		if (messages.Count > messageCount)
 			messages.Dequeue ();
@@ -246,16 +247,16 @@ public class NetworkManager : MonoBehaviour
 			messageWindow.text += m + '\n';
 		}
 	}
-	void AddMessage(string message)
+	void AddMessage(string message,string color)
 	{	
 		//toggle
 		if (sc.singlePlayer) {
-			ShortAddMessage (message);
+			ShortAddMessage (message,color);
 		}
-		else photonView.RPC ("AddMessage_RPC", PhotonTargets.All, message);
+		else photonView.RPC ("AddMessage_RPC", PhotonTargets.All, message,color);
 	}
 	[PunRPC]
-	void AddMessage_RPC(string message){
-		ShortAddMessage (message);
+	void AddMessage_RPC(string message ,string color){
+		ShortAddMessage (message,color);
 	}	
 }
