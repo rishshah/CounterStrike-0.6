@@ -28,10 +28,10 @@ public class PlayerShooting : MonoBehaviour
 	bool isAiming = false;
 	public bool reloading = false;
 
-	public delegate void Respawn1(float respawnTime, bool isBot, bool isPlayerCT, string name);
-	public event Respawn1 RespawnMe;
-	public delegate void SendMessage1(string message);
-	public event SendMessage1 SendNetworkedMessage;
+	public delegate void Respawn(float respawnTime, bool isBot, bool isPlayerCT, string name);
+	public event Respawn RespawnMe;
+	public delegate void SendMessage(string message);
+	public event SendMessage SendNetworkedMessage;
 	// Use this for initialization
 	void Start()
 	{
@@ -126,7 +126,7 @@ public class PlayerShooting : MonoBehaviour
 					if (++currentImpact >= maxImpacts)
 						currentImpact = 0;
 					if (hit.transform.gameObject.GetComponent<PlayerNetworkMover> ().isBot) {
-						RPCBots (hit,damageBody);
+						RPCBots (hit,damageHead);
 					}
 					else hit.transform.GetComponentInParent<PhotonView>().RPC("GetShot", PhotonTargets.All, damageHead,PhotonNetwork.player.name);
 				}
@@ -144,15 +144,11 @@ public class PlayerShooting : MonoBehaviour
 		if (localPNM.health <= 0) {
 			localPNM.search (shootingPlayer);
 			localPNM.sm.ChangeScore (shootingPlayer, "Kills", 1);
-			localPNM.sm.ChangeScore (shootingPlayer, "Deaths", 1);
+			localPNM.sm.ChangeScore (dyingPlayer, "Deaths", 1);
 			if (SendNetworkedMessage != null)
 				SendNetworkedMessage (dyingPlayer + " was killed by " + shootingPlayer);
 			if (RespawnMe != null){
-				Debug.Log ("!!!!" + dyingPlayer);
 				RespawnMe (3f, true, localPNM.isCT, dyingPlayer);
-			}
-			else{
-				Debug.Log ("!!!!! Not" + dyingPlayer);
 			}
 			PhotonNetwork.Destroy (hit.transform.gameObject.GetComponent<PhotonView> ());
 		}

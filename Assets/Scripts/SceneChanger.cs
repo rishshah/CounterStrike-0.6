@@ -109,11 +109,11 @@ public class SceneChanger : MonoBehaviour {
 	public void BotInitSpawn(){
 		for (int i = 0; i < valCT; i++) {
 			string s = "BOT CT: " + (i+1).ToString ();	
-			nm.StartSpawnProcess(3f, true, true,s);
+			nm.StartSpawnProcess(0f, true, true, s);
 		}
 		for (int i = 0; i < valT; i++) {
 			string s = "BOT T: " + (i+1).ToString ();
-			nm.StartSpawnProcess(3f, true, false,s);
+			nm.StartSpawnProcess(0f, true, false, s);
 		}
 	}
 }

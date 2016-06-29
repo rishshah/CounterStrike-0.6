@@ -12,10 +12,8 @@ public class NetworkManager : MonoBehaviour
 	Camera sceneCamera;
 
 	//#segregation
-	[SerializeField]
-	Transform[] CTspawnPoints;
-	[SerializeField]
-	Transform[] TspawnPoints;
+	Transform[] CTspawnPoints = new Transform[6];
+	Transform[] TspawnPoints = new Transform[6];
 
 	//UI lobby
 	[SerializeField] InputField username;
@@ -56,6 +54,11 @@ public class NetworkManager : MonoBehaviour
     public GameObject T;
 	Color BLUE= new Color(0.067f,1f,1f);
 	Color RED= new Color(0.796f,0.2745f,0.2745f);
+
+	//MAPS
+	public GameObject map1000Prefab;
+	public GameObject mapAwpIndiaPrefab;
+	GameObject map;
 
 	void Start()
 	{
@@ -113,6 +116,13 @@ public class NetworkManager : MonoBehaviour
 	void OnJoinedRoom()
 	{	
 		isJoinedRoom =true;
+		map =(GameObject)Instantiate (map1000Prefab, new Vector3(0f,-12f,0f), Quaternion.Euler(270f,0f,0f));
+		for (int i = 0; i < 6; i++) {
+			CTspawnPoints [i] = map.transform.Find ("SpawnPoints/CT").GetChild (i).transform;
+		}
+		for (int i = 0; i < 6; i++) {
+			TspawnPoints [i] = map.transform.Find ("SpawnPoints/T").GetChild (i).transform;
+		}
 		connectionText.text = "";
 		StartSpawnProcess(0f, false, sc.isPlayerCT, username.text);
 		sc.BotInitSpawn ();
@@ -131,30 +141,28 @@ public class NetworkManager : MonoBehaviour
 		sceneCamera.enabled = false;
 
 		//#toggle & #segregation spawning
+
         int CTindex = Random.Range(0, CTspawnPoints.Length);
 		int Tindex = Random.Range(0, TspawnPoints.Length);
 
 		if (isPlayerCT) {
-			player = PhotonNetwork.Instantiate ("FPSPlayer", CTspawnPoints [CTindex].position, CTspawnPoints [CTindex].rotation, 0);
+			player = PhotonNetwork.Instantiate ("FPSPlayer", CTspawnPoints [CTindex].position, CTspawnPoints [CTindex].rotation,0);
 			player.gameObject.GetComponent<PlayerNetworkMover> ().isCT = true;
 			player.transform.parent = CT.transform;
-			player.transform.GetChild(0).GetComponent<MeshRenderer> ().material.color = BLUE;
-			player.transform.GetChild (2).transform.GetChild (2).GetComponent<MeshRenderer> ().material.color = BLUE;
+			player.transform.Find("Body").GetComponent<MeshRenderer> ().material.color = BLUE;
+			player.transform.Find("Head/Cap").GetComponent<MeshRenderer> ().material.color = BLUE;
 		} 
 		else{
 			player = PhotonNetwork.Instantiate ("FPSPlayer", TspawnPoints [Tindex].position, TspawnPoints [Tindex].rotation, 0);
 			player.gameObject.GetComponent<PlayerNetworkMover> ().isCT = false;
 			player.transform.parent = T.transform;
-			player.transform.GetChild(0).GetComponent<MeshRenderer> ().material.color = RED;
-			player.transform.GetChild(2).transform.GetChild(2).GetComponent<MeshRenderer> ().material.color = RED;
+			player.transform.Find("Body").GetComponent<MeshRenderer> ().material.color = RED;
+			player.transform.Find("Head/Cap").GetComponent<MeshRenderer> ().material.color = RED;
 		}
 		player.transform.name = name;
+		 
+		player.GetComponent<PlayerNetworkMover> ().isBot = isBot;
 
-		if (!isBot) 
-			player.GetComponent<PlayerNetworkMover> ().isBot = false;
-		else 
-			player.GetComponent<PlayerNetworkMover> ().isBot = true;
-		
 		//DELEGATE NOTING
 		player.GetComponent<PlayerNetworkMover>().RespawnMe += StartSpawnProcess;
 		player.GetComponent<PlayerNetworkMover>().SendNetworkedMessage += AddMessage;

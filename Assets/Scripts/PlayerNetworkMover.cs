@@ -21,8 +21,9 @@ public class PlayerNetworkMover : Photon.MonoBehaviour
     public ScoreManager sm;
    
 	//AI
-	public bool isBot;
 	public bool isCT;
+	public bool isBot;
+
 	void Start()
 	{
 
@@ -42,21 +43,29 @@ public class PlayerNetworkMover : Photon.MonoBehaviour
 			transform.Find("FirstPersonCharacter/Camera/M4A1/mag/Mesh_0012").gameObject.layer = 11;
 			transform.Find("FirstPersonCharacter/Camera/M4A1/mag").gameObject.layer = 11;
 			transform.Find("FirstPersonCharacter/Camera/M4A1/Mesh_0011").gameObject.layer = 11;
+			Debug.Log (transform.name + " :: " + transform.position.y.ToString ());
+
 		}
-		else{
+		else if(!photonView.isMine && !isBot){
 			StartCoroutine("UpdateData");
+			Debug.Log (transform.name + " :: " + transform.position.y.ToString ());
 		}
 	}
 
 
 	IEnumerator UpdateData()
-	{
+	{	
+		Debug.Log (transform.name + " ::1 " + transform.position.y.ToString ());
+
 		while(true)
 		{
+			
 			transform.position = Vector3.Lerp(transform.position, position, Time.deltaTime * smoothing);
 			if(rotation.w!=0	 || rotation.x!=0 || rotation.y!=0 || rotation.z!=0) transform.rotation = Quaternion.Lerp(transform.rotation, rotation, Time.deltaTime * smoothing);
 			yield return null;
 		}
+		Debug.Log (transform.name + " ::2 " + transform.position.y.ToString ());
+
 	}
 	void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
 	{
@@ -104,6 +113,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour
 	[PunRPC]
 	public void GetShot(float damage,string shootingPerson)
 	{
+		Debug.Log ("INRPC");
 		health -= damage;
 		AddDamage(shootingPerson, damage);
 		if (health <= 0)

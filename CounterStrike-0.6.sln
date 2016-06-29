@@ -7,6 +7,8 @@ Project("{2839EAC3-5DCC-1DF3-A950-3D5FC1016C5D}") = "CounterStrike-0.6", "Assemb
 EndProject
 Project("{2839EAC3-5DCC-1DF3-A950-3D5FC1016C5D}") = "CounterStrike-0.6", "Assembly-CSharp-Editor.csproj", "{69785CD0-E258-1851-B03B-61914EB1F4B1}"
 EndProject
+Project("{2839EAC3-5DCC-1DF3-A950-3D5FC1016C5D}") = "CounterStrike-0.6", "Assembly-UnityScript.unityproj", "{4F110969-0CCF-EF6E-C3DB-89FF3D0B0387}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{69785CD0-E258-1851-B03B-61914EB1F4B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69785CD0-E258-1851-B03B-61914EB1F4B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69785CD0-E258-1851-B03B-61914EB1F4B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F110969-0CCF-EF6E-C3DB-89FF3D0B0387}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F110969-0CCF-EF6E-C3DB-89FF3D0B0387}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F110969-0CCF-EF6E-C3DB-89FF3D0B0387}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F110969-0CCF-EF6E-C3DB-89FF3D0B0387}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

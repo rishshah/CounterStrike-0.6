@@ -1,21 +1,23 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityStandardAssets.Characters.FirstPerson;
+using UnityEngine.UI;
 
 public class PowerUp : MonoBehaviour
 {
-    float powertime = 0f;
+    public float powertime = 0f;
     bool powerup = false;
     bool multiplepowerup = false;
     // Health powerup variables
-    bool healthpower = false;
-    float healthtimelimit = 10;
-    float currenthealth = 0f;
+    public bool healthpower = false;
+    public float healthtimelimit = 10;
+    public float currenthealth = 0f;
     float healthboost = 100f;
     public PlayerNetworkMover pnm;
+
     // Flash powerup variables
     bool speedpower = false;
-    float speedtimelimit = 10;
+    public float speedtimelimit = 10;
     float speedboost = 2f;
     public FirstPersonController fps;
 
@@ -27,6 +29,13 @@ public class PowerUp : MonoBehaviour
         powertime = 0f;
 
     }
+    void Healthend()
+    {
+        pnm.health = Mathf.Min(currenthealth, pnm.health);
+        powertime = 0f;
+        healthpower = false;
+        powerup = false;
+    }
 
 
     // Update is called once per frame
@@ -36,7 +45,7 @@ public class PowerUp : MonoBehaviour
         //INitalise Health
         if (Input.GetKeyDown(KeyCode.Q) && (!powerup || multiplepowerup))
         {
-            Debug.Log(currenthealth);
+            //  Debug.Log(currenthealth);
             currenthealth = pnm.health;
             pnm.health += healthboost;
             healthpower = true;
@@ -48,14 +57,14 @@ public class PowerUp : MonoBehaviour
             if (powertime < healthtimelimit)
             {
                 powertime += Time.deltaTime;
+                if (currenthealth >= pnm.health)
+                {
+                    Healthend();
+                }
             }
             else
             {
-                pnm.health = Mathf.Min(currenthealth, pnm.health);
-                powertime = 0f;
-                healthpower = false;
-                powerup = false;
-
+                Healthend();
             }
 
         }
@@ -81,6 +90,7 @@ public class PowerUp : MonoBehaviour
                 fps.m_RunSpeed /= speedboost;
                 powerup = false;
                 speedpower = false;
+                powertime = 0f;
 
             }
         }

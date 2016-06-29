@@ -1,13 +1,13 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\NetworkManager.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\PlayerNetworkMover.cs">
     <Files>
-      <File FileName="Assets\Scripts\NetworkManager.cs" Line="118" Column="22" />
-      <File FileName="Assets\Scripts\UIManager.cs" Line="45" Column="94" />
-      <File FileName="Assets\Scripts\ScoreManager.cs" Line="67" Column="14" />
-      <File FileName="Assets\Scripts\SceneChanger.cs" Line="119" Column="33" />
-      <File FileName="Assets\Scripts\PlayerShooting.cs" Line="153" Column="8" />
-      <File FileName="Assets\Scripts\PlayerNetworkMover.cs" Line="119" Column="55" />
+      <File FileName="Assets\Scripts\SceneChanger.cs" Line="112" Column="18" />
+      <File FileName="Assets\Scripts\NetworkManager.cs" Line="179" Column="24" />
+      <File FileName="Assets\Scripts\UIManager.cs" Line="34" Column="20" />
+      <File FileName="Assets\Scripts\ScoreManager.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\PlayerShooting.cs" Line="151" Column="5" />
+      <File FileName="Assets\Scripts\PlayerNetworkMover.cs" Line="48" Column="4" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

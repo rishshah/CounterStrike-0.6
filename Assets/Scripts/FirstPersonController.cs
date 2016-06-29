@@ -11,7 +11,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
     [RequireComponent(typeof(AudioSource))]
     public class FirstPersonController : MonoBehaviour
     {
-
+        Vector3 initBodyScale;
+        Vector3 crouchScale = new Vector3(1f,.6f,1f);
+        Vector3 initBodyPos;
         [SerializeField]
         private bool m_IsWalking;
         [SerializeField]
@@ -65,10 +67,17 @@ namespace UnityStandardAssets.Characters.FirstPerson
         bool reloading = false;
         bool crouched = false;
         bool isRunning;
+        float crouchHeadMove;
+        float crouchBodyMove;
+        float crouchWalkSpeedFactor = .5f;
 
         // Use this for initialization
         private void Start()
         {
+            initBodyScale = transform.FindChild("Body").localScale;
+            initBodyPos = transform.FindChild("Body").position;
+            crouchBodyMove = initBodyPos.y * (1f - crouchScale.y);
+            crouchHeadMove = (transform.FindChild("Head").position.y - initBodyPos.y) * (1f-crouchScale.y)+crouchBodyMove;
             m_CharacterController = GetComponent<CharacterController>();
             m_Camera = Camera.main;
             m_OriginalCameraPosition = m_Camera.transform.localPosition;
@@ -85,28 +94,28 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         // Update is called once per frame
         private void Update()
-        {
+        {   
             if (Input.GetKeyDown(KeyCode.LeftControl))
-            {
-                transform.GetChild(0).localScale = new Vector3(1.2f, 1f, 1.2f);
-                transform.GetChild(0).position -= transform.up * 0.5f;
-                transform.GetChild(1).position -= transform.up * 1f;
-                transform.GetChild(2).position -= transform.up * 1f;
-                m_OriginalCameraPosition.y -= 1f;
+            {   
+                transform.FindChild("Body").localScale = new Vector3(initBodyScale.x*crouchScale.x, initBodyScale.y*crouchScale.y, initBodyScale.z*crouchScale.z);
+                transform.FindChild("Body").position -= transform.up * crouchBodyMove;
+                transform.FindChild("Head").position -= transform.up * crouchHeadMove;
+                transform.FindChild("FirstPersonCharacter").position -= transform.up * crouchHeadMove;
+                m_OriginalCameraPosition.y -= crouchHeadMove;
                 crouched = true;
-                m_WalkSpeed = m_WalkSpeed / 2;
+                m_WalkSpeed = m_WalkSpeed * crouchWalkSpeedFactor;
                 m_FovKick.Setup(m_Camera);
                 m_HeadBob.Setup(m_Camera, m_StepInterval);
             }
             else if (Input.GetKeyUp(KeyCode.LeftControl))
             {
-                transform.GetChild(0).localScale = new Vector3(1.2f, 1.5f, 1.2f);
-                transform.GetChild(0).position += transform.up * 0.5f;
-                transform.GetChild(1).position += transform.up * 1f;
-                transform.GetChild(2).position += transform.up * 1f;
-                m_OriginalCameraPosition.y += 1f;
+                transform.FindChild("Body").localScale = initBodyScale;
+                transform.FindChild("Body").position += transform.up * crouchBodyMove;
+                transform.FindChild("Head").position += transform.up * crouchHeadMove;
+                transform.FindChild("FirstPersonCharacter").position += transform.up * crouchHeadMove;
+                m_OriginalCameraPosition.y += crouchHeadMove;
                 crouched = false;
-                m_WalkSpeed = m_WalkSpeed * 2;
+                m_WalkSpeed = m_WalkSpeed / crouchWalkSpeedFactor;
                 m_FovKick.Setup(m_Camera);
                 m_HeadBob.Setup(m_Camera, m_StepInterval);
             }
