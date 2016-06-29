@@ -11,8 +11,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
     [RequireComponent(typeof(AudioSource))]
     public class FirstPersonController : MonoBehaviour
     {
+		public Transform level;
         Vector3 initBodyScale;
-        Vector3 crouchScale = new Vector3(1f,.6f,1f);
+        Vector3 crouchScale = new Vector3(1.3f,.6f,1.3f);
         Vector3 initBodyPos;
         [SerializeField]
         private bool m_IsWalking;
@@ -67,17 +68,17 @@ namespace UnityStandardAssets.Characters.FirstPerson
         bool reloading = false;
         bool crouched = false;
         bool isRunning;
-        float crouchHeadMove;
-        float crouchBodyMove;
+        //float headHeight=1.1f;
+		float crouchBodyMove, crouchHeadMove;
         float crouchWalkSpeedFactor = .5f;
+		float bodyHeight = 3f;
 
         // Use this for initialization
         private void Start()
         {
             initBodyScale = transform.FindChild("Body").localScale;
-            initBodyPos = transform.FindChild("Body").position;
-            crouchBodyMove = initBodyPos.y * (1f - crouchScale.y);
-            crouchHeadMove = (transform.FindChild("Head").position.y - initBodyPos.y) * (1f-crouchScale.y)+crouchBodyMove;
+			crouchBodyMove = (bodyHeight/2f) * (1f - crouchScale.y);
+			crouchHeadMove = crouchBodyMove * 2f;
             m_CharacterController = GetComponent<CharacterController>();
             m_Camera = Camera.main;
             m_OriginalCameraPosition = m_Camera.transform.localPosition;
@@ -110,7 +111,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             else if (Input.GetKeyUp(KeyCode.LeftControl))
             {
                 transform.FindChild("Body").localScale = initBodyScale;
-                transform.FindChild("Body").position += transform.up * crouchBodyMove;
+                transform.FindChild("Body").	position += transform.up * crouchBodyMove;
                 transform.FindChild("Head").position += transform.up * crouchHeadMove;
                 transform.FindChild("FirstPersonCharacter").position += transform.up * crouchHeadMove;
                 m_OriginalCameraPosition.y += crouchHeadMove;
