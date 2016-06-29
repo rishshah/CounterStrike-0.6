@@ -52,12 +52,13 @@ public class NetworkManager : MonoBehaviour
     //CT and T segregation
     public GameObject CT;
     public GameObject T;
-	Color BLUE= new Color(0.067f,1f,1f);
-	Color RED= new Color(0.796f,0.2745f,0.2745f);
+	public Color BLUE= new Color(0.067f,1f,1f);
+	public Color RED= new Color(0.796f,0.2745f,0.2745f);
 
 	//MAPS
 	public GameObject map1000Prefab;
 	public GameObject mapAwpIndiaPrefab;
+
 	GameObject map;
 
 	void Start()
@@ -103,7 +104,11 @@ public class NetworkManager : MonoBehaviour
 	}
 
     public void JoinRoom()
-	{	PhotonNetwork.player.name = username.text;
+	{	if (sc.isError) {
+			Debug.Log ("ERROR");
+			return;
+		}
+		PhotonNetwork.player.name = username.text;
 		//toggle
 		if (sc.singlePlayer)
 			PhotonNetwork.JoinRoom (roomname.text);
@@ -116,13 +121,17 @@ public class NetworkManager : MonoBehaviour
 	void OnJoinedRoom()
 	{	
 		isJoinedRoom =true;
-		map =(GameObject)Instantiate (map1000Prefab, new Vector3(0f,-12f,0f), Quaternion.Euler(270f,0f,0f));
+
+		if(sc.map=="1000")  map =(GameObject)Instantiate (map1000Prefab, new Vector3(0f,-12f,0f), Quaternion.Euler(270f,0f,0f));
+		if(sc.map=="awpbase")  map =(GameObject)Instantiate (mapAwpIndiaPrefab, mapAwpIndiaPrefab.transform.position, mapAwpIndiaPrefab.transform.rotation);
+
 		for (int i = 0; i < 6; i++) {
 			CTspawnPoints [i] = map.transform.Find ("SpawnPoints/CT").GetChild (i).transform;
 		}
 		for (int i = 0; i < 6; i++) {
 			TspawnPoints [i] = map.transform.Find ("SpawnPoints/T").GetChild (i).transform;
 		}
+		Debug.Log ("DONE");
 		connectionText.text = "";
 		StartSpawnProcess(0f, false, sc.isPlayerCT, username.text);
 		sc.BotInitSpawn ();
